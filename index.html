@@ -2236,7 +2236,7 @@ function renderIncomeSummary(){
       </div>
     </div>
   `;
-
+}
 
 function buildIncCard(src,idx){
   const cur=src.currency||'USD';
@@ -3294,6 +3294,40 @@ auth.onAuthStateChanged(async(user)=>{
 
 // Refresh exchange rates every 30 minutes
 setInterval(()=>{if(_currentUser)fetchExchangeRates().then(()=>refreshDash());},1800000);
+
+// ===== MOBILE INTERACTIVITY ENHANCEMENTS =====
+// Make all .btn elements at least 44x44px on mobile for touch accessibility
+if(window.matchMedia('(max-width:640px)').matches){
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.querySelectorAll('.btn').forEach(btn=>{
+      btn.style.minHeight='44px';
+      btn.style.minWidth='44px';
+      btn.style.fontSize='1.1em';
+    });
+    // Make modal overlays easier to close on tap
+    document.querySelectorAll('.modal-overlay').forEach(modal=>{
+      modal.addEventListener('click',e=>{if(e.target===modal)modal.style.display='none';});
+    });
+    // Improve input focus on mobile
+    document.querySelectorAll('input,select,textarea').forEach(inp=>{
+      inp.addEventListener('focus',()=>{inp.scrollIntoView({behavior:'smooth',block:'center'});});
+    });
+    // Add swipe-to-close for sidebar
+    let startX=null;
+    const sidebar=document.getElementById('sidebarNav');
+    if(sidebar){
+      sidebar.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;});
+      sidebar.addEventListener('touchend',e=>{
+        if(startX!==null&&e.changedTouches[0].clientX<startX-60){
+          sidebar.classList.remove('open');
+          const ov=document.getElementById('sbOverlay');
+          if(ov)ov.classList.remove('show');
+        }
+        startX=null;
+      });
+    }
+  });
+}
 </script>
 </body>
 </html>
