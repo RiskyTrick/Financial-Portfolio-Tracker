@@ -133,23 +133,27 @@ select.fi{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
 .s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh1);animation:fadeUp .3s var(--ease) both;transition:box-shadow .2s,transform .2s}
 .s-card:hover{box-shadow:var(--sh2)}
 .s-card.archived{background:#F7F5F0;border-color:#C5BFAE;opacity:.85}
-.s-stripe{height:4px}
-.s-head{padding:16px 18px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.s-stripe{height:4px;background:var(--border2)!important;}
+.s-head{padding:16px 18px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;background:var(--surface2);}
 .s-head-left{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
-.s-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:17px;flex-shrink:0}
-.s-name{font-family:var(--serif);font-size:15.5px;font-weight:700;color:var(--ink);background:transparent;border:none;outline:none;width:100%;border-bottom:1.5px solid transparent;padding-bottom:1px;transition:border-color .18s;letter-spacing:-.01em;font-style:italic}
+.s-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:17px;flex-shrink:0;background:var(--surface3);color:var(--ink2);}
+.s-name{font-family:var(--serif);font-size:15.5px;font-weight:700;color:var(--ink2);background:transparent;border:none;outline:none;width:100%;border-bottom:1.5px solid transparent;padding-bottom:1px;transition:border-color .18s;letter-spacing:-.01em;font-style:italic}
 .s-name:focus{border-color:var(--green)}
 .s-meta{font-size:11px;color:var(--ink3);margin-top:2px}
 .s-actions{display:flex;gap:3px;flex-shrink:0}
 
 /* QUICK STATS */
 .qs{display:grid;gap:0;margin:13px 18px 0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.qi{padding:10px 14px;border-right:1px solid var(--border);background:var(--surface2);transition:background .18s}
+.qi{padding:10px 14px;border-right:1px solid var(--border);background:var(--surface);transition:background .18s}
 .qi:last-child{border-right:none}
-.qi:hover{background:var(--bg)}
+.qi:hover{background:var(--surface2)}
 .qi-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
-.qi-val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink)}
-.qi-val.g{color:var(--green)}.qi-val.r{color:var(--red)}.qi-val.b{color:var(--blue)}.qi-val.a{color:var(--amber2)}.qi-val.v{color:var(--violet2)}
+.qi-val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink2)}
+.qi-val.g{color:#1B5E40;font-weight:700;}
+.qi-val.r{color:#B91C1C;font-weight:700;}
+.qi-val.b{color:#1E3A8A;font-weight:700;}
+.qi-val.a{color:#92400E;font-weight:700;}
+.qi-val.v{color:#5B21B6;font-weight:700;}
 
 /* TABS */
 .s-tabs{display:flex;padding:0 18px;margin-top:13px;border-bottom:1px solid var(--border);overflow-x:auto;gap:0}
@@ -197,8 +201,8 @@ select.fi{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
 .er-amount{font-family:var(--mono);font-size:14px;font-weight:600;background:transparent;border:none;outline:none;text-align:right;width:105px;border-bottom:1px dashed transparent;transition:border-color .18s}
 .er-amount:focus{border-color:var(--green)}
 .er-badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:100px;text-transform:uppercase;letter-spacing:.04em}
-.er-del{width:27px;height:27px;border-radius:7px;border:none;background:none;color:var(--ink4);cursor:pointer;font-size:13px;display:grid;place-items:center;flex-shrink:0;transition:all .18s}
-.er-del:hover{background:var(--red-bg);color:var(--red)}
+.er-del{width:27px;height:27px;border-radius:7px;border:none;background:none;color:var(--ink3);cursor:pointer;font-size:13px;display:grid;place-items:center;flex-shrink:0;transition:all .18s}
+.er-del:hover{background:var(--surface3);color:var(--red)}
 
 /* ADD PANEL */
 .add-panel{border-radius:var(--r);padding:15px 16px;margin-bottom:15px;border:1.5px solid transparent}
