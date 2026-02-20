@@ -683,6 +683,8 @@ select.fi{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
   </div>
   <div class="sec-body">
     <div class="sec-accent" style="color:var(--red)"></div>
+    <!-- Expenses Summary Tracker -->
+    <div id="exp_summary" style="display:none"></div>
     <div class="sec-grid" id="exp_grid"></div>
     <div id="exp_empty" class="empty-state"><div class="es-icon">💸</div><div class="es-title">No expense trackers</div><div class="es-sub">Click "+ New Tracker" to begin logging expenses.</div></div>
   </div>
@@ -703,6 +705,8 @@ select.fi{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
   </div>
   <div class="sec-body">
     <div class="sec-accent" style="color:var(--violet2)"></div>
+    <!-- Portfolio Summary Tracker -->
+    <div id="port_summary" style="display:none"></div>
     <div class="sec-grid" id="port_grid"></div>
     <div id="port_empty" class="empty-state"><div class="es-icon">📈</div><div class="es-title">No portfolios yet</div><div class="es-sub">Click "+ New Portfolio" to start tracking investments.</div></div>
   </div>
@@ -723,6 +727,8 @@ select.fi{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
   </div>
   <div class="sec-body">
     <div class="sec-accent" style="color:var(--amber2)"></div>
+    <!-- Income Summary Tracker -->
+    <div id="inc_summary" style="display:none"></div>
     <div class="sec-grid" id="inc_grid"></div>
     <div id="inc_empty" class="empty-state"><div class="es-icon">💰</div><div class="es-title">No income sources</div><div class="es-sub">Click "+ Add Source" to start logging income.</div></div>
   </div>
@@ -1746,6 +1752,7 @@ function renderExpenses(){
   grid.innerHTML='';
   empty.style.display=state.expenses.length?'none':'block';
   setEl('nc_exp',state.expenses.reduce((s,t)=>s+(t.entries||[]).length,0)||'0');
+  renderExpenseSummary();
   state.expenses.forEach((t,i)=>{const d=document.createElement('div');d.innerHTML=buildExpCard(t,i);grid.appendChild(d.firstElementChild);});
 }
 
@@ -1900,6 +1907,7 @@ function renderPortfolios(){
   grid.innerHTML='';
   empty.style.display=state.portfolios.length?'none':'block';
   setEl('nc_port',state.portfolios.reduce((s,p)=>s+(p.holdings||[]).length,0)||'0');
+  renderPortfolioSummary();
   state.portfolios.forEach((p,i)=>{const d=document.createElement('div');d.innerHTML=buildPortCard(p,i);grid.appendChild(d.firstElementChild);});
 }
 
@@ -2067,7 +2075,166 @@ function renderIncomes(){
   grid.innerHTML='';
   empty.style.display=state.incomes.length?'none':'block';
   setEl('nc_inc',state.incomes.reduce((s,i)=>s+(i.entries||[]).length,0)||'0');
+  renderIncomeSummary();
   state.incomes.forEach((src,i)=>{const d=document.createElement('div');d.innerHTML=buildIncCard(src,i);grid.appendChild(d.firstElementChild);});
+// ════════════════════════════════
+//   EXPENSE SUMMARY TRACKER
+// ════════════════════════════════
+function renderExpenseSummary(){
+  const container=document.getElementById('exp_summary');
+  if(!container)return;
+  if(state.expenses.length===0){container.style.display='none';return;}
+  let totalSpent=0, totalBudget=0, totalEntries=0;
+  let byCat={};
+  state.expenses.forEach(t=>{
+    const cur=t.currency||'USD';
+    (t.entries||[]).forEach(e=>{
+      totalSpent+=toUSD(parseFloat(e.amount)||0,cur);
+      byCat[e.category]=(byCat[e.category]||0)+toUSD(parseFloat(e.amount)||0,cur);
+      totalEntries++;
+    });
+    totalBudget+=toUSD(parseFloat(t.budget)||0,cur);
+  });
+  const pct=totalBudget>0?Math.min(100,totalSpent/totalBudget*100):0;
+  const catSorted=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const topCat=catSorted[0];
+  container.style.display='block';
+  container.innerHTML = `
+    <div class="loan-summary" style="background:linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%);color:#B91C1C">
+      <div class="ls-title"><span>💸</span> EXPENSES OVERVIEW — ${totalEntries} Entries</div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:4px">
+        <div style="font-family:var(--serif);font-style:italic;font-size:32px;line-height:1">${fmtUSD(totalSpent)}</div>
+        <div style="font-size:12px;color:rgba(185,28,28,.6)">total spent</div>
+      </div>
+      <div style="margin:14px 0 4px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(185,28,28,.7);margin-bottom:5px">
+          <span>Budget Used</span>
+          <span style="font-family:var(--mono);color:#B91C1C">${pct.toFixed(1)}%</span>
+        </div>
+        <div style="height:6px;background:rgba(185,28,28,.08);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#F87171,#B91C1C);border-radius:4px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(185,28,28,.5);margin-top:4px">
+          <span>${fmtUSD(totalBudget)} budgeted</span>
+          <span>${fmtUSD(Math.max(0,totalBudget-totalSpent))} remaining</span>
+        </div>
+      </div>
+      <div class="ls-grid">
+        <div class="ls-item"><div class="ls-lbl">Total Spent</div><div class="ls-val r">${fmtUSD(totalSpent)}</div><div class="ls-sub">all trackers</div></div>
+        <div class="ls-item"><div class="ls-lbl">Budgeted</div><div class="ls-val">${fmtUSD(totalBudget)}</div><div class="ls-sub">set across trackers</div></div>
+        <div class="ls-item"><div class="ls-lbl">Entries</div><div class="ls-val">${totalEntries}</div><div class="ls-sub">all time</div></div>
+        <div class="ls-item"><div class="ls-lbl">Top Category</div><div class="ls-val">${topCat?topCat[0]:'—'}</div><div class="ls-sub">${topCat?fmtUSD(topCat[1]):'—'}</div></div>
+      </div>
+    </div>
+  `;
+}
+
+// ════════════════════════════════
+//   PORTFOLIO SUMMARY TRACKER
+// ════════════════════════════════
+function renderPortfolioSummary(){
+  const container=document.getElementById('port_summary');
+  if(!container)return;
+  if(state.portfolios.length===0){container.style.display='none';return;}
+  let totalVal=0, totalCost=0, totalHoldings=0;
+  let bySector={};
+  state.portfolios.forEach(p=>{
+    const cur=p.currency||'USD';
+    (p.holdings||[]).forEach(h=>{
+      const val=toUSD((parseFloat(h.shares)||0)*(parseFloat(h.curPrice)||0),cur);
+      const cost=toUSD((parseFloat(h.shares)||0)*(parseFloat(h.buyPrice)||0),cur);
+      totalVal+=val;
+      totalCost+=cost;
+      bySector[h.sector]=(bySector[h.sector]||0)+val;
+      totalHoldings++;
+    });
+  });
+  const pnl=totalVal-totalCost;
+  const pnlPct=totalCost>0?pnl/totalCost*100:0;
+  const sectorSorted=Object.entries(bySector).sort((a,b)=>b[1]-a[1]);
+  const topSector=sectorSorted[0];
+  container.style.display='block';
+  container.innerHTML = `
+    <div class="loan-summary" style="background:linear-gradient(135deg,#EDE9FE 0%,#DDD6FE 100%);color:#5B21B6">
+      <div class="ls-title"><span>📈</span> PORTFOLIO OVERVIEW — ${totalHoldings} Holdings</div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:4px">
+        <div style="font-family:var(--serif);font-style:italic;font-size:32px;line-height:1">${fmtUSD(totalVal)}</div>
+        <div style="font-size:12px;color:rgba(91,33,182,.6)">market value</div>
+      </div>
+      <div style="margin:14px 0 4px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(91,33,182,.7);margin-bottom:5px">
+          <span>P&L</span>
+          <span style="font-family:var(--mono);color:#5B21B6">${pnl>=0?'+':''}${fmtUSD(pnl)} (${pnlPct.toFixed(2)}%)</span>
+        </div>
+        <div style="height:6px;background:rgba(91,33,182,.08);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${Math.min(100,Math.abs(pnlPct))}%;background:linear-gradient(90deg,#A78BFA,#5B21B6);border-radius:4px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(91,33,182,.5);margin-top:4px">
+          <span>${fmtUSD(totalCost)} invested</span>
+          <span>${topSector?topSector[0]:'—'} top sector</span>
+        </div>
+      </div>
+      <div class="ls-grid">
+        <div class="ls-item"><div class="ls-lbl">Market Value</div><div class="ls-val v">${fmtUSD(totalVal)}</div><div class="ls-sub">current</div></div>
+        <div class="ls-item"><div class="ls-lbl">Invested</div><div class="ls-val">${fmtUSD(totalCost)}</div><div class="ls-sub">total cost</div></div>
+        <div class="ls-item"><div class="ls-lbl">Holdings</div><div class="ls-val">${totalHoldings}</div><div class="ls-sub">across portfolios</div></div>
+        <div class="ls-item"><div class="ls-lbl">Top Sector</div><div class="ls-val">${topSector?topSector[0]:'—'}</div><div class="ls-sub">${topSector?fmtUSD(topSector[1]):'—'}</div></div>
+      </div>
+    </div>
+  `;
+}
+
+// ════════════════════════════════
+//   INCOME SUMMARY TRACKER
+// ════════════════════════════════
+function renderIncomeSummary(){
+  const container=document.getElementById('inc_summary');
+  if(!container)return;
+  if(state.incomes.length===0){container.style.display='none';return;}
+  let totalReceived=0, totalExpected=0, totalEntries=0;
+  let byCat={};
+  state.incomes.forEach(s=>{
+    const cur=s.currency||'USD';
+    (s.entries||[]).forEach(e=>{
+      totalReceived+=toUSD(parseFloat(e.amount)||0,cur);
+      byCat[s.category]=(byCat[s.category]||0)+toUSD(parseFloat(e.amount)||0,cur);
+      totalEntries++;
+    });
+    totalExpected+=toUSD(parseFloat(s.expected)||0,cur);
+  });
+  const pct=totalExpected>0?Math.min(100,totalReceived/totalExpected*100):0;
+  const catSorted=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const topCat=catSorted[0];
+  container.style.display='block';
+  container.innerHTML = `
+    <div class="loan-summary" style="background:linear-gradient(135deg,#FEF9C3 0%,#FDE68A 100%);color:#92400E">
+      <div class="ls-title"><span>💰</span> INCOME OVERVIEW — ${totalEntries} Entries</div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:4px">
+        <div style="font-family:var(--serif);font-style:italic;font-size:32px;line-height:1">${fmtUSD(totalReceived)}</div>
+        <div style="font-size:12px;color:rgba(146,64,14,.6)">total received</div>
+      </div>
+      <div style="margin:14px 0 4px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(146,64,14,.7);margin-bottom:5px">
+          <span>vs Expected</span>
+          <span style="font-family:var(--mono);color:#92400E">${pct.toFixed(1)}%</span>
+        </div>
+        <div style="height:6px;background:rgba(146,64,14,.08);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#FBBF24,#92400E);border-radius:4px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(146,64,14,.5);margin-top:4px">
+          <span>${fmtUSD(totalExpected)} expected</span>
+          <span>${topCat?topCat[0]:'—'} top category</span>
+        </div>
+      </div>
+      <div class="ls-grid">
+        <div class="ls-item"><div class="ls-lbl">Total Received</div><div class="ls-val g">${fmtUSD(totalReceived)}</div><div class="ls-sub">all sources</div></div>
+        <div class="ls-item"><div class="ls-lbl">Expected</div><div class="ls-val">${fmtUSD(totalExpected)}</div><div class="ls-sub">set across sources</div></div>
+        <div class="ls-item"><div class="ls-lbl">Entries</div><div class="ls-val">${totalEntries}</div><div class="ls-sub">all time</div></div>
+        <div class="ls-item"><div class="ls-lbl">Top Category</div><div class="ls-val">${topCat?topCat[0]:'—'}</div><div class="ls-sub">${topCat?fmtUSD(topCat[1]):'—'}</div></div>
+      </div>
+    </div>
+  `;
+}
 }
 
 function buildIncCard(src,idx){
