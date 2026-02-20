@@ -35,6 +35,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 input,select,textarea,button{font-family:inherit}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
 input[type=number]{-moz-appearance:textfield}
+input[type=number]{appearance:textfield;-moz-appearance:textfield}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -2077,6 +2078,7 @@ function renderIncomes(){
   setEl('nc_inc',state.incomes.reduce((s,i)=>s+(i.entries||[]).length,0)||'0');
   renderIncomeSummary();
   state.incomes.forEach((src,i)=>{const d=document.createElement('div');d.innerHTML=buildIncCard(src,i);grid.appendChild(d.firstElementChild);});
+}
 // ════════════════════════════════
 //   EXPENSE SUMMARY TRACKER
 // ════════════════════════════════
@@ -2234,8 +2236,7 @@ function renderIncomeSummary(){
       </div>
     </div>
   `;
-}
-}
+
 
 function buildIncCard(src,idx){
   const cur=src.currency||'USD';
