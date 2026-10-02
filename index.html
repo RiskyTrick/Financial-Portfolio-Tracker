@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://open.er-api.com https://api.coingecko.com; frame-src https://*.firebaseapp.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://open.er-api.com https://api.coingecko.com https://finnhub.io https://www.alphavantage.co; frame-src https://*.firebaseapp.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Portfolio Tracker</title>
 <meta name="theme-color" content="#F3F5FB">
@@ -1188,6 +1188,33 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
 .an-section-h{display:flex;align-items:baseline;gap:10px;margin:26px 0 14px;font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink)}
 .an-section-h span{font:500 12px var(--sans);color:var(--ink3)}
 .dd-legend{font-size:11px;color:var(--ink3);margin-top:8px}
+/* Data-coverage chip under each page title */
+.tb-span{font-size:10.5px;color:var(--ink3);margin-top:3px;font-family:var(--mono);letter-spacing:-.01em;display:flex;flex-wrap:wrap;gap:2px 8px}
+.tb-span b{color:var(--ink2);font-weight:600}
+.tb-span .live{color:#10B981}.tb-span .live::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#10B981;margin-right:4px;box-shadow:0 0 6px #10B981;vertical-align:1px}
+@media(max-width:600px){.tb-span{font-size:9.5px}}
+/* Loan lifetime stats */
+#loan_lifetime .loan-summary{--h1:#3B82F6;--h2:#10B981}
+.life-cur{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.09);font-size:11.5px;color:rgba(255,255,255,.6)}
+.life-cur b{color:#fff;font-family:var(--mono);font-weight:600}
+/* History trends */
+.ht-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin:10px 0 6px}
+.ht-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.ht-head b{font-size:13px}.ht-head span{font-size:11px;color:var(--ink3)}
+.ht-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:12px 0}
+.ht-kpi{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:9px 11px}
+.ht-kpi i{display:block;font-style:normal;font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.ht-kpi b{font-family:var(--mono);font-size:14px}.ht-kpi small{display:block;font-size:10px;color:var(--ink3)}
+.ht-table{width:100%;border-collapse:collapse;font-size:11.5px;font-family:var(--mono)}
+.ht-table th{font-family:var(--sans,inherit);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);text-align:right;padding:6px 8px;border-bottom:1px solid var(--border)}
+.ht-table th:first-child,.ht-table td:first-child{text-align:left}
+.ht-table td{text-align:right;padding:7px 8px;border-bottom:1px solid var(--border)}
+.ht-scroll{overflow-x:auto}
+.hm-years{display:flex;gap:4px;flex-wrap:wrap}
+/* Price-feed modal */
+.mkt-note{font-size:11.5px;color:var(--ink3);line-height:1.5;margin-bottom:12px}
+.mkt-links{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;margin:-2px 0 10px}
+.mkt-links a{color:var(--violet2,#7C3AED);text-decoration:none}.mkt-links a:hover{text-decoration:underline}
 .gold-note{font-size:12px;line-height:1.55;color:var(--ink2);padding:10px 14px;margin:0 0 12px;border-radius:12px;background:var(--amber-bg);border:1px solid var(--amber-mid)}
 .sched-table tr.proj td{opacity:.6;font-style:italic}
 .fx-top{position:fixed;right:22px;bottom:22px;z-index:310;width:44px;height:44px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:18px;cursor:pointer;box-shadow:var(--sh3);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);opacity:0;transform:translateY(16px) scale(.9);pointer-events:none;transition:opacity .3s,transform .35s var(--spring)}
@@ -1538,6 +1565,7 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
         <select class="fi hist-cur" id="hist_cur" onchange="_histLimit=80;renderHistory()"></select>
       </div>
       <div class="hm-card" id="hist_heat"></div>
+      <div id="hist_trends"></div>
       <div id="hist_timeline"></div>
     </div>
     <div id="hist_closed" style="display:none"></div>
@@ -1547,6 +1575,21 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
 </div><!-- /main-area -->
 
 <!-- ═══════════ MODALS ═══════════ -->
+
+<!-- LIVE PRICE FEEDS -->
+<div class="modal-overlay" id="m_mkt" style="display:none" onclick="closeOut(event,'m_mkt')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">⚡ Live price feeds</div><button class="btn btn-ghost btn-icon" onclick="closeModal('m_mkt')">✕</button></div>
+    <div class="modal-body">
+      <div class="mkt-note">Crypto prices come from CoinGecko automatically. Stock exchanges don't allow keyless browser access, so stocks use free API keys that you create. Keys are saved in your private cloud record.</div>
+      <div class="fg"><label class="fg-label">Finnhub key · US stocks, real-time, 60 calls/min</label><input class="fi" id="mk_fh" type="text" autocomplete="off" spellcheck="false" placeholder="Free key from finnhub.io/register"></div>
+      <div class="fg"><label class="fg-label">Alpha Vantage key · Indian stocks (BSE) + fallback, 25 calls/day</label><input class="fi" id="mk_av" type="text" autocomplete="off" spellcheck="false" placeholder="Free key from alphavantage.co/support/#api-key"></div>
+      <div class="mkt-links"><a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">Get a Finnhub key ↗</a><a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noopener noreferrer">Get an Alpha Vantage key ↗</a></div>
+      <div class="mkt-note" id="mk_status"></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m_mkt')">Cancel</button><button class="btn btn-save" onclick="saveMktKeys()">💾 Save &amp; refresh</button></div>
+  </div>
+</div>
 
 <!-- NEW LOAN -->
 <div class="modal-overlay" id="m_newloan" style="display:none" onclick="closeOut(event,'m_newloan')">
@@ -2102,8 +2145,8 @@ let _saveDebounce=null;
 let _cloudBlocked=false;
 const _skFor=uid=>SK+'_'+uid;
 const _clean=d=>typeof sanitizeState==='function'?sanitizeState(d):{loans:[],expenses:[],portfolios:[],incomes:[],accounts:[]};
-function _applyData(d){const c=_clean(d);state.loans=c.loans;state.expenses=c.expenses;state.portfolios=c.portfolios;state.incomes=c.incomes;state.accounts=c.accounts;}
-const _snapshot=()=>({v:2,loans:state.loans,expenses:state.expenses,portfolios:state.portfolios,incomes:state.incomes,accounts:state.accounts||[]});
+function _applyData(d){const c=_clean(d);state.loans=c.loans;state.expenses=c.expenses;state.portfolios=c.portfolios;state.incomes=c.incomes;state.accounts=c.accounts;state.settings=c.settings||{};}
+const _snapshot=()=>({v:2,loans:state.loans,expenses:state.expenses,portfolios:state.portfolios,incomes:state.incomes,accounts:state.accounts||[],settings:state.settings||{}});
 
 function saveState(){
   if(_currentUser){
@@ -3116,7 +3159,7 @@ function buildPortCard(port,idx){
       <div class="s-meta"><span class="kind-pill ${isC?'crypto':'stock'}">${isC?'Crypto':'Stocks'}</span> ${cur} · ${holdings.length} holdings${port.desc?` · ${esc(port.desc)}`:''}${port.pricesAt?` · prices ${esc(new Date(port.pricesAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}))}`:''}</div>
     </div>
   </div>
-  <div class="s-actions">${isC&&holdings.length?`<button class="btn btn-xs btn-outline" onclick="refreshCryptoPrices('${port.id}',this)" title="Fetch live prices from CoinGecko">⚡ Live prices</button>`:''}<button class="btn btn-ghost btn-icon" onclick="deletePortfolio('${port.id}')" title="Delete portfolio">🗑</button></div>
+  <div class="s-actions">${holdings.length?`<button class="btn btn-xs btn-outline" onclick="refreshPrices('${port.id}',this)" title="${isC?'Fetch live prices from CoinGecko':'Fetch live stock quotes (Finnhub / Alpha Vantage)'}">⚡ Live prices</button>`:''}<button class="btn btn-ghost btn-icon" onclick="deletePortfolio('${port.id}')" title="Delete portfolio">🗑</button></div>
 </div>
 <div class="qs" style="grid-template-columns:repeat(4,1fr)">
   <div class="qi"><div class="qi-label">Market Value</div><div class="qi-val v">${fmt(totalVal,cur)}</div></div>
@@ -5015,7 +5058,7 @@ function renderPortFilters(){
   const n=k=>state.portfolios.filter(p=>k==='all'||(p.kind||'stock')===k).length;
   bar.style.display='flex';
   bar.innerHTML=`<div class="filter-group"><span class="filter-group-label">🧺 Type</span>${[['all','All'],['stock','📈 Stocks'],['crypto','🪙 Crypto']].map(([k,l])=>`<button class="filter-chip ${_portKind===k?'active':''}" onclick="_portKind='${k}';renderPortfolios()">${l}<span class="filter-count">${n(k)}</span></button>`).join('')}</div>
-    ${state.portfolios.some(p=>p.kind==='crypto'&&(p.holdings||[]).length)?'<button class="btn btn-outline btn-sm" onclick="refreshAllCrypto()">⚡ Refresh crypto prices</button>':''}`;
+    <div class="filter-group" style="margin-left:auto;gap:6px"><button class="btn btn-outline btn-sm" onclick="refreshAllPrices(true)" title="Refresh live prices for every portfolio">⚡ Refresh prices</button><button class="btn btn-ghost btn-sm" onclick="openMktKeys()" title="Set up live stock price feeds">🔑 Price feeds</button></div>`;
 }
 function openNewPort(kind){
   kind=kind||(_portKind==='crypto'?'crypto':'stock');
@@ -5340,22 +5383,31 @@ function renderHistHero(ev){
     </div>
   </div>`;
 }
+let _hmYear='';
 function renderHeatmap(base){
   const el=document.getElementById('hist_heat');if(!el)return;
   const counts={};base.forEach(e=>{counts[e.date]=(counts[e.date]||0)+1;});
+  const years=[...new Set(base.map(e=>e.date.slice(0,4)))].sort().reverse();
+  if(_hmYear&&!years.includes(_hmYear))_hmYear='';
   const today=new Date();today.setHours(0,0,0,0);
-  const start=new Date(today);start.setDate(start.getDate()-(25*7+today.getDay()));
+  let start,end;
+  if(_hmYear){start=new Date(+_hmYear,0,1);end=new Date(+_hmYear,11,31);if(end>today)end=new Date(today);}
+  else{end=new Date(today);start=new Date(today);start.setDate(start.getDate()-364);}
+  start.setDate(start.getDate()-start.getDay());
   let cells='',active=0,total=0;
-  for(let d=new Date(start);d<=today||d.getDay()!==0;d.setDate(d.getDate()+1)){
-    const k=_iso(d),n=counts[k]||0,fut=d>today;
-    if(!fut&&n){active++;total+=n;}
+  for(let d=new Date(start);d<=end||d.getDay()!==0;d.setDate(d.getDate()+1)){
+    const k=_iso(d),n=counts[k]||0,out=d>end||(_hmYear&&k.slice(0,4)!==_hmYear);
+    if(!out&&n){active++;total+=n;}
     const lv=n===0?0:n===1?1:n<=3?2:n<=6?3:4;
-    cells+=`<i class="${fut?'fut':'l'+lv}${_histDay===k?' sel':''}" title="${fmtDate(k)} · ${_plural(n,'event')}"${fut?'':` onclick="setHistDay('${k}')"`}></i>`;
+    cells+=`<i class="${out?'fut':'l'+lv}${_histDay===k?' sel':''}" title="${fmtDate(k)} · ${_plural(n,'event')}"${out?'':` onclick="setHistDay('${k}')"`}></i>`;
   }
-  el.innerHTML=`<div class="hm-meta"><b>${_plural(active,'active day')}</b><span>${_plural(total,'event')} in the last 26 weeks</span>
+  const yb=(y,l)=>`<button class="filter-chip ${_hmYear===y?'active':''}" onclick="_hmYear='${y}';renderHistory()">${l}</button>`;
+  el.innerHTML=`<div class="hm-meta"><b>${_plural(active,'active day')}</b><span>${_plural(total,'event')} ${_hmYear?'in '+_hmYear:'in the last 12 months'}</span>
+      <span class="hm-years">${yb('','12M')}${years.map(y=>yb(y,y)).join('')}</span>
       <span class="hm-leg">Less <i></i><i style="background:rgba(99,102,241,.3)"></i><i style="background:rgba(99,102,241,.5)"></i><i style="background:rgba(99,102,241,.75)"></i><i style="background:#6366F1"></i> More</span>
       ${_histDay?`<button class="day-chip" onclick="setHistDay('${_histDay}')">📅 ${fmtDate(_histDay)} ✕</button>`:'<span style="font-size:10.5px">Click a day to filter</span>'}</div>
     <div class="hm" role="grid" aria-label="Activity heatmap">${cells}</div>`;
+  const hm=el.querySelector('.hm');if(hm)hm.scrollLeft=hm.scrollWidth;
 }
 function renderClosedLog(){
   const c=document.getElementById('hist_closed');
@@ -5436,6 +5488,7 @@ function sanitizeState(d){
     accounts:_arr(d.accounts,500).map(a=>{const o={id:_idf(a.id),name:_s(a.name,80)||'Account',bank:_s(a.bank,80),country:_in(a.country,COUNTRIES.map(c=>c.c),'OT'),currency:_curf(a.currency),type:_tok(a.type)||'Other',opening:_n(a.opening),openDate:_dt(a.openDate),notes:_s(a.notes,300),archived:!!a.archived,
       txns:_arr(a.txns,20000).map(t=>{const x={id:_idf(t.id),date:_dt(t.date),type:_in(t.type,Object.keys(TXN_TYPES),'Deposit'),amount:_n(t.amount),desc:_s(t.desc)};_opt(x,'linkId',_RX_ID.test(t.linkId||'')?t.linkId:undefined);_opt(x,'fx',_s(t.fx,60));_opt(x,'cat',typeof BANK_CATS!=='undefined'&&BANK_CATS[t.cat]?t.cat:undefined);return x;})};
       _opt(o,'closedAt',_dt(a.closedAt));return o;}),
+    settings:(()=>{const s=d.settings&&typeof d.settings==='object'?d.settings:{},k=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(v)?v:'';return{finnhub:k(s.finnhub),alphav:k(s.alphav)};})(),
   };
 }
 
@@ -5692,6 +5745,205 @@ window.populateSelects=function(){_populateSelectsBase();const m=document.getEle
 document.getElementById('nl_type')?.addEventListener('change',e=>{const m=document.getElementById('nl_method');if(m)m.value=e.target.value==='Gold'?'gold':'emi';});
 document.getElementById('nl_name')?.addEventListener('input',e=>{const m=document.getElementById('nl_method');if(m&&/\bgold\b/i.test(e.target.value))m.value='gold';});
 auth.onAuthStateChanged(u=>{document.body.classList.toggle('authed',!!u);if(!u){_routedOnce=false;_expandedClosed.clear();}});
+
+/* ── Data coverage: earliest → latest date behind each section ── */
+function _span(dates){let a='',b='';for(let d of dates){if(typeof d!=='string'||!/^\d{4}-\d{2}/.test(d))continue;if(d.length===7)d+='-01';if(!a||d<a)a=d;if(!b||d>b)b=d;}return{a,b};}
+function _ago(iso){const s=(Date.now()-new Date(iso))/1000;return s<90?'just now':s<3600?Math.round(s/60)+' min ago':s<86400?Math.round(s/3600)+' h ago':Math.round(s/86400)+' d ago';}
+function renderDataSpans(){
+  if(!_authed())return;
+  const P=state.portfolios||[],L=state.loans||[],A=state.accounts||[],n=x=>x.toLocaleString('en-US');
+  const txns=A.flatMap(a=>a.txns||[]),lp=L.flatMap(l=>l.payments||[]),ee=state.expenses.flatMap(t=>t.entries||[]),ie=state.incomes.flatMap(s=>s.entries||[]),hh=P.flatMap(p=>p.holdings||[]);
+  const ev=collectEvents(),evSpan=_span(ev.map(e=>e.date)),priced=P.map(p=>p.pricesAt).filter(Boolean).sort().pop();
+  const S={
+    acct:['Data from',_span(txns.map(t=>t.date).concat(A.map(a=>a.openDate))),`${n(txns.length)} transactions · ${_plural(A.length,'account')}`],
+    loan:['Data from',_span(L.map(l=>l.startDate).concat(lp.map(p=>p.date))),`${_plural(L.length,'loan')} · ${n(lp.length)} payments`],
+    exp:['Data from',_span(ee.map(e=>e.date)),`${n(ee.length)} entries`],
+    inc:['Data from',_span(ie.map(e=>e.date)),`${n(ie.length)} entries`],
+    port:['Holdings bought',_span(hh.map(h=>h.date)),`${_plural(hh.length,'holding')}${priced?` · <span class="live">prices ${_ago(priced)}</span>`:''}`],
+    hist:['Data from',evSpan,`${n(ev.length)} events`],
+    dash:['Data from',evSpan,`${n(ev.length)} records`],
+    analytics:['Data from',evSpan,`${n(ev.length)} records`],
+  };
+  Object.entries(S).forEach(([sec,[lbl,s,extra]])=>{
+    const host=document.querySelector(`#pg_${sec} .tb-left > div:last-child`);if(!host)return;
+    let el=host.querySelector('.tb-span');if(!el){el=document.createElement('div');el.className='tb-span';host.appendChild(el);}
+    el.innerHTML=s.a?`<span>📅 ${lbl} <b>${fmtDate(s.a)}</b> → ${fmtDate(s.b)}</span><span>${extra}</span>`:`<span>${extra||'No dated records yet'}</span>`;
+  });
+}
+
+/* ── Loans: lifetime totals across every loan (incl. closed) ── */
+function renderLoanLifetime(){
+  const host=document.getElementById('loan_summary');if(!host)return;
+  let el=document.getElementById('loan_lifetime');
+  if(!el){el=document.createElement('div');el.id='loan_lifetime';host.after(el);}
+  if(!state.loans.length){el.innerHTML='';return;}
+  const by={};let b=0,p=0,i=0,pp=0,closed=0,first='';
+  state.loans.forEach(l=>{
+    const m=calcLoanMetrics(l),c=l.currency||'USD',x=by[c]||(by[c]={b:0,p:0,i:0,n:0});
+    x.b+=m.P;x.p+=m.totalPaid;x.i+=m.totalIntPaid;x.n++;
+    b+=toUSD(m.P,c);p+=toUSD(m.totalPaid,c);i+=toUSD(m.totalIntPaid,c);pp+=toUSD(m.totalPrinPaid,c);if(l.archived)closed++;
+    const sd=(l.startDate||'').length===7?l.startDate+'-01':l.startDate;if(sd&&(!first||sd<first))first=sd;
+  });
+  const it=(l,v,c,s)=>`<div class="ls-item"><div class="ls-lbl">${l}</div><div class="ls-val ${c}">${v}</div><div class="ls-sub">${s}</div></div>`;
+  el.innerHTML=`<div class="loan-summary">
+    <div class="ls-title"><span>📜</span> LIFETIME — every loan ever tracked${first?' · since '+fmtDate(first):''}</div>
+    <div class="ls-grid">
+      ${it('Total borrowed',fmtUSD(b,0),'b','original principal · USD equiv.')}
+      ${it('Total repaid',fmtUSD(p,0),'g','all payments made')}
+      ${it('Principal repaid',fmtUSD(pp,0),'',b>0?(pp/b*100).toFixed(0)+'% of borrowed':'')}
+      ${it('Interest paid',fmtUSD(i,0),'r',p>0?(i/p*100).toFixed(1)+'% of repayments':'')}
+      ${it('Loans',String(state.loans.length),'a',`${state.loans.length-closed} open · ${closed} closed`)}
+    </div>
+    <div class="life-cur">${Object.entries(by).map(([c,x])=>`<span>${CUR_FLAGS[c]||''} ${c} · ${_plural(x.n,'loan')} · borrowed <b>${fmt(x.b,c,0)}</b> · repaid <b>${fmt(x.p,c,0)}</b> · interest <b>${fmt(x.i,c,0)}</b></span>`).join('')}</div>
+  </div>`;
+}
+const _renderLoanSummaryBase=renderLoanSummary;
+window.renderLoanSummary=function(){_renderLoanSummaryBase();renderLoanLifetime();};
+
+/* ── History: all-time trends (monthly chart + year-by-year table) ── */
+let _htChart=null,_htKey='';
+function renderHistTrends(){
+  const el=document.getElementById('hist_trends');if(!el)return;
+  const base=_histBase(collectEvents()).filter(e=>e.amt!=null&&!e.neutral&&e.k!=='mile');
+  const key=`${_histKind}|${document.getElementById('hist_cur')?.value}|${document.getElementById('hist_q')?.value}|${base.length}|${base.reduce((s,e)=>s+e.amt,0).toFixed(2)}`;
+  if(key===_htKey&&el.innerHTML)return;_htKey=key;
+  if(_htChart){_htChart.destroy();_htChart=null;}
+  if(!base.length){el.innerHTML='';return;}
+  const M={},Y={},z=()=>({inc:0,exp:0,debt:0,bin:0,bout:0,n:0});
+  const add=(o,k,e)=>{const r=o[k]||(o[k]=z()),u=toUSD(e.amt,e.cur);r.n++;
+    if(e.k==='inc')r.inc+=u;else if(e.k==='exp')r.exp-=u;else if(e.k==='loan')r.debt-=u;else if(e.k==='bank'&&!e.transfer){if(u>=0)r.bin+=u;else r.bout-=u;}};
+  base.forEach(e=>{add(M,e.date.slice(0,7),e);add(Y,e.date.slice(0,4),e);});
+  let first='',last='';base.forEach(e=>{if(!first||e.date<first)first=e.date;if(e.date>last)last=e.date;});
+  const months=[];for(let d=new Date(first.slice(0,7)+'-01T00:00:00');_iso(d).slice(0,7)<=last.slice(0,7);d.setMonth(d.getMonth()+1))months.push(_iso(d).slice(0,7));
+  const Z=z(),row=k=>M[k]||Z,flow=months.filter(k=>row(k).inc||row(k).exp);
+  const tot=Object.values(Y).reduce((s,r)=>{for(const k in s)s[k]+=r[k];return s;},z());
+  const nets=flow.map(k=>[k,row(k).inc-row(k).exp]).sort((a,b)=>b[1]-a[1]),best=nets[0],worst=nets[nets.length-1];
+  const ml=k=>new Date(k+'-01T00:00:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'});
+  const sgn=v=>(v>=0?'+':'−')+fmtUSD(Math.abs(v),0);
+  const kpi=(l,v,s,c='')=>`<div class="ht-kpi"><i>${l}</i><b class="${c}">${v}</b>${s?`<small>${s}</small>`:''}</div>`;
+  const net=tot.inc-tot.exp,fm=Math.max(1,flow.length);
+  el.innerHTML=`<div class="ht-card">
+    <div class="ht-head"><b>📈 Trends · all time</b><span>${fmtDate(first)} → ${fmtDate(last)} · ${_plural(months.length,'month')} · USD equiv.${_histKind!=='all'?' · '+HK[_histKind].l+' only':''}</span></div>
+    <div class="ht-kpis">
+      ${kpi('Lifetime income',fmtUSD(tot.inc,0),'income entries','c-pos')}
+      ${kpi('Lifetime spending',fmtUSD(tot.exp,0),'expense entries','c-neg')}
+      ${kpi('Net saved',sgn(net),tot.inc>0?(net/tot.inc*100).toFixed(1)+'% savings rate':'',net>=0?'c-pos':'c-neg')}
+      ${kpi('Avg month',`${fmtUSD(tot.inc/fm,0)} in`,`${fmtUSD(tot.exp/fm,0)} out · ${_plural(flow.length,'active month')}`)}
+      ${kpi('Best month',best?ml(best[0]):'—',best?sgn(best[1]):'','c-pos')}
+      ${kpi('Toughest month',worst?ml(worst[0]):'—',worst?sgn(worst[1]):'','c-neg')}
+      ${kpi('Debt repaid',fmtUSD(tot.debt,0),'loan payments')}
+    </div>
+    <div class="ch-wrap h240"><canvas id="ht_chart"></canvas></div>
+    <div class="ht-scroll" style="margin-top:12px"><table class="ht-table"><thead><tr><th>Year</th><th>Income</th><th>Spending</th><th>Net</th><th>Saved</th><th>Debt repaid</th><th>Bank in</th><th>Bank out</th><th>Events</th></tr></thead><tbody>
+      ${Object.keys(Y).sort().reverse().map(y=>{const r=Y[y],nt=r.inc-r.exp;return `<tr><td><b>${y}</b></td><td class="c-pos">${fmtUSD(r.inc,0)}</td><td class="c-neg">${fmtUSD(r.exp,0)}</td><td class="${nt>=0?'c-pos':'c-neg'}">${sgn(nt)}</td><td>${r.inc>0?Math.round(nt/r.inc*100).toString().replace(/^-0$/,'0')+'%':'—'}</td><td>${fmtUSD(r.debt,0)}</td><td>${fmtUSD(r.bin,0)}</td><td>${fmtUSD(r.bout,0)}</td><td>${r.n.toLocaleString('en-US')}</td></tr>`;}).join('')}
+    </tbody></table></div>
+  </div>`;
+  const cv=document.getElementById('ht_chart');
+  if(cv&&typeof Chart!=='undefined')_htChart=new Chart(cv,{type:'bar',data:{labels:months.map(ml),datasets:[
+    {type:'line',label:'Net',data:months.map(k=>row(k).inc-row(k).exp),borderColor:'#6366F1',backgroundColor:'#6366F1',tension:.3,pointRadius:1.5,borderWidth:2,order:0},
+    {label:'Income',data:months.map(k=>row(k).inc),backgroundColor:'#10B981CC',borderRadius:3,order:1},
+    {label:'Spending',data:months.map(k=>row(k).exp),backgroundColor:'#F43F5ECC',borderRadius:3,order:1},
+    {label:'Debt repaid',data:months.map(k=>row(k).debt),backgroundColor:'#3B82F6AA',borderRadius:3,order:1,hidden:true}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{boxWidth:8,font:{size:10}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtUSD(c.raw,0)}`}}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:14}},y:{ticks:{font:{size:9},callback:v=>fmtUSD(v,0)}}}}});
+}
+const _renderHistoryBase=renderHistory;
+window.renderHistory=function(){_renderHistoryBase();if(_histView!=='closed')renderHistTrends();};
+
+/* ── Live stock prices: Finnhub (US, real-time) · Alpha Vantage (India via BSE, and US fallback) ── */
+const _AVBAD='fintrack_avbad',_pxBusy=new Set();
+let _avBad=(()=>{try{return JSON.parse(localStorage.getItem(_AVBAD)||'{}')||{};}catch(e){return{};}})(),_avLast=0,_pxTimer=null;
+const _sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function _fhQuote(sym,key){
+  const r=await fetch('https://finnhub.io/api/v1/quote?symbol='+encodeURIComponent(sym)+'&token='+encodeURIComponent(key));
+  if(r.status===401||r.status===403)throw new Error('Finnhub key was rejected');
+  if(r.status===429)throw new Error('Finnhub rate limit — try again in a minute');
+  if(!r.ok)return null;
+  const d=await r.json();return d&&+d.c>0?{px:+d.c,ch:isFinite(+d.dp)?+d.dp:null}:null;
+}
+async function _avQuote(sym,key){
+  // Free tier allows ~5 calls/minute
+  const wait=_avLast+13000-Date.now();if(wait>0)await _sleep(wait);_avLast=Date.now();
+  const r=await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+encodeURIComponent(sym)+'&apikey='+encodeURIComponent(key));
+  const d=await r.json();
+  if(d.Note||d.Information)throw new Error('Alpha Vantage limit reached (25 calls/day on the free key)');
+  const q=d['Global Quote']||{},px=parseFloat(q['05. price']);
+  return px>0?{px,ch:parseFloat(String(q['10. change percent']||'').replace('%',''))}:null;
+}
+async function refreshStockPrices(pid,btn,silent){
+  const p=state.portfolios.find(x=>x.id===pid);if(!p||!(p.holdings||[]).length||_pxBusy.has(pid))return 0;
+  const k=state.settings||{},cur=p.currency||'USD',useFh=cur==='USD'&&!!k.finnhub;
+  if(!useFh&&!k.alphav){if(!silent){toast(cur==='USD'?'Add a free Finnhub key for live US quotes':'Add a free Alpha Vantage key for live Indian quotes','info');openMktKeys();}return 0;}
+  _pxBusy.add(pid);const lbl=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='⏳ Fetching…';}
+  let n=0,err=null;const miss=[];
+  try{
+    for(const h of p.holdings){
+      const t=String(h.ticker||'').toUpperCase();if(!t)continue;
+      let q=null;
+      if(useFh)q=await _fhQuote(t,k.finnhub);
+      else{
+        const sym=cur==='INR'?t+'.BSE':t;
+        if(_avBad[sym]){miss.push(t);continue;}
+        if(btn)btn.textContent=`⏳ ${t}…`;
+        q=await _avQuote(sym,k.alphav);
+        if(!q){_avBad[sym]=1;try{localStorage.setItem(_AVBAD,JSON.stringify(_avBad));}catch(e){}}
+      }
+      if(q){h.curPrice=Math.round(q.px*10000)/10000;h.dayChangePct=isFinite(q.ch)?q.ch:null;n++;}else miss.push(t);
+    }
+  }catch(e){err=e;}
+  _pxBusy.delete(pid);
+  if(n){p.pricesAt=new Date().toISOString();saveState();renderPortfolios();refreshDash();renderDataSpans();}
+  else if(btn){btn.disabled=false;btn.textContent=lbl;}
+  if(!silent){
+    if(err)toast('Live prices: '+err.message+(n?` (${n} updated)`:''),'err');
+    else toast(n?`Live prices updated for ${_plural(n,'holding')} ✓${miss.length?' · no quote: '+miss.join(', '):''}`:'No quotes found'+(miss.length?' for '+miss.join(', '):''),n?'ok':'warn');
+  }
+  return n;
+}
+function refreshPrices(pid,btn){const p=state.portfolios.find(x=>x.id===pid);if(p)return p.kind==='crypto'?refreshCryptoPrices(pid,btn):refreshStockPrices(pid,btn);}
+async function refreshAllPrices(manual){
+  const ps=state.portfolios.filter(p=>(p.holdings||[]).length),k=state.settings||{};
+  if(!ps.length){if(manual)toast('No holdings yet','info');return;}
+  if(manual&&ps.some(p=>p.kind!=='crypto')&&!k.finnhub&&!k.alphav){openMktKeys();return;}
+  if(manual)toast('Fetching live prices…','info');
+  let n=0;
+  for(const p of ps){try{n+=await (p.kind==='crypto'?refreshCryptoPrices(p.id,null,true):refreshStockPrices(p.id,null,true));}catch(e){}}
+  if(manual)toast(n?`Live prices updated for ${_plural(n,'holding')} ✓`:'No prices updated — check your price feed keys',n?'ok':'warn');
+}
+function _autoPrices(){
+  if(!_authed()||document.visibilityState!=='visible')return;
+  const on=document.querySelector('.sec-page.active')?.id;if(on!=='pg_port'&&on!=='pg_dash')return;
+  const k=state.settings||{},now=Date.now(),age=p=>p.pricesAt?now-new Date(p.pricesAt):Infinity;
+  state.portfolios.forEach(p=>{
+    if(!(p.holdings||[]).length||_pxBusy.has(p.id))return;
+    const cur=p.currency||'USD';
+    const due=p.kind==='crypto'?age(p)>5*60e3:(cur==='USD'&&k.finnhub)?age(p)>5*60e3:k.alphav?age(p)>24*3600e3:false;
+    if(due)(p.kind==='crypto'?refreshCryptoPrices(p.id,null,true):refreshStockPrices(p.id,null,true)).catch(()=>{});
+  });
+}
+function openMktKeys(){
+  const k=state.settings||{};
+  document.getElementById('mk_fh').value=k.finnhub||'';document.getElementById('mk_av').value=k.alphav||'';
+  setEl('mk_status',`Status: Finnhub ${k.finnhub?'✓ connected':'— not set'} · Alpha Vantage ${k.alphav?'✓ connected':'— not set'}. US portfolios refresh every 5 min while you view Portfolio/Dashboard; Indian quotes once a day (free-tier limit) or on demand.`);
+  openModal('m_mkt');
+}
+function saveMktKeys(){
+  const v=id=>document.getElementById(id).value.trim(),ok=s=>!s||/^[A-Za-z0-9_-]{8,80}$/.test(s);
+  const fh=v('mk_fh'),av=v('mk_av');
+  if(!ok(fh)||!ok(av)){setEl('mk_status','⚠ That doesn\'t look like an API key (8–80 letters and digits).');return;}
+  if(av!==(state.settings||{}).alphav){_avBad={};try{localStorage.removeItem(_AVBAD);}catch(e){}}
+  state.settings={...(state.settings||{}),finnhub:fh,alphav:av};
+  saveState();closeModal('m_mkt');toast('Price feeds saved ✓','ok');
+  if(fh||av)refreshAllPrices(true);
+}
+CMDS.push({g:'Actions',i:'⚡',t:'Refresh all live prices',a:1,run:()=>refreshAllPrices(true)},{g:'Actions',i:'🔑',t:'Set up live stock price feeds',a:1,run:()=>openMktKeys()});
+
+const _goToSpans=window.goTo;
+window.goTo=function(sec,el){_goToSpans(sec,el);renderDataSpans();if(sec==='port'||sec==='dash')_autoPrices();};
+const _renderAllSpans=window.renderAll;
+window.renderAll=function(){
+  _renderAllSpans();renderDataSpans();
+  if(!_pxTimer&&_authed()){_pxTimer=setInterval(_autoPrices,60e3);setTimeout(_autoPrices,3000);}
+};
 
 /* ── Static selects for the new modals ── */
 (()=>{
