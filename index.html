@@ -1281,6 +1281,28 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
 .pf-dgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
 @media(max-width:900px){.pf-hero,.pf-grid2{grid-template-columns:minmax(0,1fr)}.pf-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.pf-val{font-size:30px}.pf-dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.pf-movers{grid-template-columns:1fr}.pf-tm{height:240px}}
+/* Portfolio navigator */
+.pf-tabs{display:flex;gap:4px;padding:4px;margin:0 0 16px;border-radius:14px;background:var(--surface);border:1px solid var(--border);width:max-content;max-width:100%;overflow-x:auto;position:sticky;top:64px;z-index:6;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.pf-tabs button{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border:0;border-radius:10px;background:none;color:var(--ink2);font:600 12.5px var(--sans,inherit);cursor:pointer;white-space:nowrap;transition:background-color .2s,color .2s}
+.pf-tabs button:hover{color:var(--ink);background:var(--surface2)}
+.pf-tabs button.on{background:linear-gradient(135deg,#8B5CF6,#EC4899);color:#fff;box-shadow:0 6px 18px -8px #8B5CF6}
+.pf-tabs button span{font:600 10px var(--mono);padding:1px 7px;border-radius:999px;background:rgba(127,127,127,.18)}
+.pf-tabs button.on span{background:rgba(255,255,255,.25)}
+#pg_port[data-pfv=screen] :is(#port_summary,#port_filters,#port_grid,#port_empty,#pf_hist),
+#pg_port[data-pfv=accounts] :is(#pf_screen,#pf_hist),
+#pg_port[data-pfv=history] :is(#pf_screen,#port_summary,#port_filters,#port_grid,#port_empty){display:none!important}
+/* Period filter bar on summary cards */
+.per-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-2px 0 14px;position:relative;z-index:2}
+.per-chips{display:inline-flex;flex-wrap:wrap;gap:4px;padding:3px;border-radius:999px;background:rgba(127,127,127,.12)}
+.per-chips button{border:0;background:none;color:inherit;opacity:.75;font:600 11px var(--sans,inherit);padding:4px 11px;border-radius:999px;cursor:pointer}
+.per-chips button:hover{opacity:1}
+.per-chips button.on{opacity:1;background:var(--surface);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.4)}
+.per-sel{font:600 11px var(--sans,inherit);padding:5px 9px;border-radius:999px;border:1px solid rgba(127,127,127,.3);background:var(--surface);color:var(--ink);cursor:pointer}
+.per-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 18px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(127,127,127,.18)}
+.per-row{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n v" "b p";gap:2px 8px;font-size:11.5px}
+.per-row span{grid-area:n;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.per-row b{grid-area:v;font-family:var(--mono)}
+.per-row i{grid-area:b;height:4px;border-radius:3px;background:rgba(127,127,127,.15);align-self:center}.per-row i em{display:block;height:100%;border-radius:3px}
+.per-row small{grid-area:p;font:500 10px var(--mono);opacity:.7}
 /* Bank ledger month dropdowns */
 details.lg-grp>summary{list-style:none;cursor:pointer;user-select:none}
 details.lg-grp>summary::-webkit-details-marker{display:none}
@@ -1548,7 +1570,9 @@ details.lg-grp[open] .lg-chev{transform:rotate(90deg)}
   </div>
   <div class="sec-body">
     <div class="sec-accent" style="color:var(--violet2)"></div>
+    <div class="pf-tabs" id="pf_tabs" role="tablist"></div>
     <div id="pf_screen"></div>
+    <div id="pf_hist"></div>
     <!-- Portfolio Summary Tracker -->
     <div id="port_summary" style="display:none"></div>
     <div id="port_filters" class="filter-bar" style="display:none"></div>
@@ -2435,8 +2459,11 @@ function calcLoanMetrics(loan){
   const enriched=sorted.map(pay=>{
     const amt=parseFloat(pay.amount)||0;
     const payDate=new Date(pay.date+'T00:00:00');
-    let ic;
-    if(prevDate && !isNaN(payDate)){
+    let ic,fee=0;
+    if(pay.int!=null&&isFinite(+pay.int)){
+      // Split taken verbatim from the lender's statement
+      ic=Math.max(0,+pay.int);fee=Math.max(0,+pay.fee||0);
+    } else if(prevDate && !isNaN(payDate)){
       // Exact day-count interest accrual since last event
       const days=daysBetween(prevDate,payDate);
       ic=Math.max(0,runBal*dailyRate*days);
@@ -2444,7 +2471,7 @@ function calcLoanMetrics(loan){
       // Fallback: simple monthly interest if no dates available
       ic=Math.max(0,runBal*mr);
     }
-    let pp=Math.max(0,amt-ic);if(pp>runBal)pp=runBal;
+    let pp=Math.max(0,amt-ic-fee);if(pp>runBal)pp=runBal;
     runBal=Math.max(0,runBal-pp);
     totalPaid+=amt;totalIntPaid+=Math.min(ic,amt);totalPrinPaid+=pp;
     if(!isNaN(payDate))prevDate=payDate;
@@ -3384,27 +3411,32 @@ function renderExpenseSummary(){
   const container=document.getElementById('exp_summary');
   if(!container)return;
   if(state.expenses.length===0){container.style.display='none';return;}
+  const R=typeof _perRange==='function'?_perRange('exp'):{from:'',to:'',label:'all time',months:0};
   let totalSpent=0, totalBudget=0, totalEntries=0;
-  let byCat={};
+  let byCat={},byTr={};
   state.expenses.forEach(t=>{
     const cur=t.currency||'USD';
     (t.entries||[]).forEach(e=>{
-      totalSpent+=toUSD(parseFloat(e.amount)||0,cur);
-      byCat[e.category]=(byCat[e.category]||0)+toUSD(parseFloat(e.amount)||0,cur);
+      if(!(!R.from||e.date>=R.from)||!(!R.to||e.date<=R.to))return;
+      const u=toUSD(parseFloat(e.amount)||0,cur);
+      totalSpent+=u;
+      byCat[e.category]=(byCat[e.category]||0)+u;byTr[t.name]=(byTr[t.name]||0)+u;
       totalEntries++;
     });
     totalBudget+=toUSD(parseFloat(t.budget)||0,cur);
   });
+  if(R.months)totalBudget*=R.months;
   const pct=totalBudget>0?Math.min(100,totalSpent/totalBudget*100):0;
   const catSorted=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
   const topCat=catSorted[0];
   container.style.display='block';
   container.innerHTML = `
     <div class="loan-summary" style="background:linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%);color:#B91C1C">
-      <div class="ls-title"><span>💸</span> EXPENSES OVERVIEW — ${totalEntries} Entries</div>
+      <div class="ls-title"><span>💸</span> EXPENSES OVERVIEW — ${totalEntries} Entries · ${esc(R.label)}</div>
+      ${typeof _perBar==='function'?_perBar('exp'):''}
       <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:4px">
         <div style="font-family:var(--serif);font-style:italic;font-size:32px;line-height:1">${fmtUSD(totalSpent)}</div>
-        <div style="font-size:12px;color:rgba(185,28,28,.6)">total spent</div>
+        <div style="font-size:12px;color:rgba(185,28,28,.6)">spent · ${esc(R.label)}</div>
       </div>
       <div style="margin:14px 0 4px">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(185,28,28,.7);margin-bottom:5px">
@@ -3420,11 +3452,12 @@ function renderExpenseSummary(){
         </div>
       </div>
       <div class="ls-grid">
-        <div class="ls-item"><div class="ls-lbl">Total Spent</div><div class="ls-val r">${fmtUSD(totalSpent)}</div><div class="ls-sub">all trackers</div></div>
-        <div class="ls-item"><div class="ls-lbl">Budgeted</div><div class="ls-val">${fmtUSD(totalBudget)}</div><div class="ls-sub">set across trackers</div></div>
-        <div class="ls-item"><div class="ls-lbl">Entries</div><div class="ls-val">${totalEntries}</div><div class="ls-sub">all time</div></div>
+        <div class="ls-item"><div class="ls-lbl">Total Spent</div><div class="ls-val r">${fmtUSD(totalSpent)}</div><div class="ls-sub">${esc(R.label)}</div></div>
+        <div class="ls-item"><div class="ls-lbl">Budgeted</div><div class="ls-val">${fmtUSD(totalBudget)}</div><div class="ls-sub">${R.months?`monthly budgets × ${R.months}`:'set across trackers'}</div></div>
+        <div class="ls-item"><div class="ls-lbl">Entries</div><div class="ls-val">${totalEntries}</div><div class="ls-sub">${R.months>1?fmtUSD(totalSpent/R.months,0)+' / month':esc(R.label)}</div></div>
         <div class="ls-item"><div class="ls-lbl">Top Category</div><div class="ls-val">${topCat?topCat[0]:'—'}</div><div class="ls-sub">${topCat?fmtUSD(topCat[1]):'—'}</div></div>
       </div>
+      ${typeof _perList==='function'?_perList(byTr,totalSpent,'#B91C1C'):''}
     </div>
   `;
 }
@@ -3494,27 +3527,32 @@ function renderIncomeSummary(){
   const container=document.getElementById('inc_summary');
   if(!container)return;
   if(state.incomes.length===0){container.style.display='none';return;}
+  const R=typeof _perRange==='function'?_perRange('inc'):{from:'',to:'',label:'all time',months:0};
   let totalReceived=0, totalExpected=0, totalEntries=0;
-  let byCat={};
+  let byCat={},bySrc={};
   state.incomes.forEach(s=>{
     const cur=s.currency||'USD';
     (s.entries||[]).forEach(e=>{
-      totalReceived+=toUSD(parseFloat(e.amount)||0,cur);
-      byCat[s.category]=(byCat[s.category]||0)+toUSD(parseFloat(e.amount)||0,cur);
+      if(!(!R.from||e.date>=R.from)||!(!R.to||e.date<=R.to))return;
+      const u=toUSD(parseFloat(e.amount)||0,cur);
+      totalReceived+=u;
+      byCat[s.category]=(byCat[s.category]||0)+u;bySrc[s.name]=(bySrc[s.name]||0)+u;
       totalEntries++;
     });
     totalExpected+=toUSD(parseFloat(s.expected)||0,cur);
   });
+  if(R.months)totalExpected*=R.months;
   const pct=totalExpected>0?Math.min(100,totalReceived/totalExpected*100):0;
   const catSorted=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
   const topCat=catSorted[0];
   container.style.display='block';
   container.innerHTML = `
     <div class="loan-summary" style="background:linear-gradient(135deg,#FEF9C3 0%,#FDE68A 100%);color:#92400E">
-      <div class="ls-title"><span>💰</span> INCOME OVERVIEW — ${totalEntries} Entries</div>
+      <div class="ls-title"><span>💰</span> INCOME OVERVIEW — ${totalEntries} Entries · ${esc(R.label)}</div>
+      ${typeof _perBar==='function'?_perBar('inc'):''}
       <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:4px">
         <div style="font-family:var(--serif);font-style:italic;font-size:32px;line-height:1">${fmtUSD(totalReceived)}</div>
-        <div style="font-size:12px;color:rgba(146,64,14,.6)">total received</div>
+        <div style="font-size:12px;color:rgba(146,64,14,.6)">received · ${esc(R.label)}</div>
       </div>
       <div style="margin:14px 0 4px">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(146,64,14,.7);margin-bottom:5px">
@@ -3530,11 +3568,12 @@ function renderIncomeSummary(){
         </div>
       </div>
       <div class="ls-grid">
-        <div class="ls-item"><div class="ls-lbl">Total Received</div><div class="ls-val g">${fmtUSD(totalReceived)}</div><div class="ls-sub">all sources</div></div>
-        <div class="ls-item"><div class="ls-lbl">Expected</div><div class="ls-val">${fmtUSD(totalExpected)}</div><div class="ls-sub">set across sources</div></div>
-        <div class="ls-item"><div class="ls-lbl">Entries</div><div class="ls-val">${totalEntries}</div><div class="ls-sub">all time</div></div>
+        <div class="ls-item"><div class="ls-lbl">Total Received</div><div class="ls-val g">${fmtUSD(totalReceived)}</div><div class="ls-sub">${esc(R.label)}</div></div>
+        <div class="ls-item"><div class="ls-lbl">Expected</div><div class="ls-val">${fmtUSD(totalExpected)}</div><div class="ls-sub">${R.months?`monthly × ${R.months}`:'set across sources'}</div></div>
+        <div class="ls-item"><div class="ls-lbl">Entries</div><div class="ls-val">${totalEntries}</div><div class="ls-sub">${R.months>1?fmtUSD(totalReceived/R.months,0)+' / month':esc(R.label)}</div></div>
         <div class="ls-item"><div class="ls-lbl">Top Category</div><div class="ls-val">${topCat?topCat[0]:'—'}</div><div class="ls-sub">${topCat?fmtUSD(topCat[1]):'—'}</div></div>
       </div>
+      ${typeof _perList==='function'?_perList(bySrc,totalReceived,'#B45309'):''}
     </div>
   `;
 }
@@ -4777,10 +4816,11 @@ function renderAcctFilters(){
 function renderAcctSummary(){
   const c=document.getElementById('acct_summary');const accts=(state.accounts||[]).filter(a=>!a.archived);
   if(!accts.length){c.innerHTML='';return;}
-  const byCur={};let total=0,monIn=0,monOut=0;const countries=new Set();let top=null;
+  const byCur={};let total=0,monIn=0,monOut=0;const countries=new Set();let top=null;const R=_perRange('acct');
   accts.forEach(a=>{
     const cur=a.currency||'USD',m=acctMetrics(a),usd=toUSD(m.bal,cur);
-    total+=usd;monIn+=toUSD(m.in30,cur);monOut+=toUSD(m.out30,cur);countries.add(a.country||'OT');
+    total+=usd;countries.add(a.country||'OT');
+    m.rows.forEach(r=>{if(r.linkId||!_inPer(R,r.date))return;const u=toUSD(r.signed,cur);if(u>=0)monIn+=u;else monOut-=u;});
     const b=byCur[cur]||(byCur[cur]={native:0,usd:0,n:0});b.native+=m.bal;b.usd+=usd;b.n++;
     if(!top||usd>top.usd)top={a,usd};
   });
@@ -4788,6 +4828,7 @@ function renderAcctSummary(){
   const share=v=>total>0?v/total*100:0;
   c.innerHTML=`<div class="loan-summary">
     <div class="ls-title"><span>🏛</span> GLOBAL CASH POSITION — ${_plural(accts.length,'account')} · ${countries.size} countr${countries.size===1?'y':'ies'}</div>
+    ${_perBar('acct')}
     <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px;flex-wrap:wrap">
       <div style="font-family:var(--serif);font-size:38px;line-height:1">${fmtUSD(total)}</div>
       <div style="font-size:12px;color:rgba(255,255,255,.45)">total cash · USD equivalent</div>
@@ -4795,8 +4836,9 @@ function renderAcctSummary(){
     <div class="cur-bar">${curs.map(([k,v],i)=>`<span style="width:${Math.max(1.5,share(Math.max(0,v.usd)))}%;background:${CUR_BAR_COLORS[i%CUR_BAR_COLORS.length]}" title="${k}: ${fmtUSD(v.usd)}"></span>`).join('')}</div>
     <div class="ls-grid" style="margin-top:14px">
       ${curs.map(([k,v],i)=>`<div class="ls-item"><div class="ls-lbl"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${CUR_BAR_COLORS[i%CUR_BAR_COLORS.length]};margin-right:5px"></span>${CUR_FLAGS[k]||'💱'} ${k} · ${_plural(v.n,'acct')}</div><div class="ls-val">${fmt(v.native,k)}</div><div class="ls-sub">≈ ${fmtUSD(v.usd)} · ${share(v.usd).toFixed(1)}%</div></div>`).join('')}
-      <div class="ls-item"><div class="ls-lbl">In · last 30 days</div><div class="ls-val g">${monIn>0?'+':''}${fmtUSD(monIn)}</div><div class="ls-sub">deposits, interest, transfers in</div></div>
-      <div class="ls-item"><div class="ls-lbl">Out · last 30 days</div><div class="ls-val r">${monOut>0?'−':''}${fmtUSD(monOut)}</div><div class="ls-sub">withdrawals, fees, transfers out</div></div>
+      <div class="ls-item"><div class="ls-lbl">In · ${esc(R.label)}</div><div class="ls-val g">${monIn>0?'+':''}${fmtUSD(monIn)}</div><div class="ls-sub">deposits &amp; interest · excl. own transfers</div></div>
+      <div class="ls-item"><div class="ls-lbl">Out · ${esc(R.label)}</div><div class="ls-val r">${monOut>0?'−':''}${fmtUSD(monOut)}</div><div class="ls-sub">withdrawals &amp; fees · excl. own transfers</div></div>
+      <div class="ls-item"><div class="ls-lbl">Net · ${esc(R.label)}</div><div class="ls-val ${monIn-monOut>=0?'g':'r'}">${monIn-monOut>=0?'+':'−'}${fmtUSD(Math.abs(monIn-monOut))}</div><div class="ls-sub">${R.months>1?fmtUSD((monIn-monOut)/R.months,0)+' / month':'money in − out'}</div></div>
       ${top?`<div class="ls-item"><div class="ls-lbl">Largest account</div><div class="ls-val b">${esc(top.a.name)}</div><div class="ls-sub">${fmtUSD(top.usd)} · ${share(top.usd).toFixed(0)}%</div></div>`:''}
     </div>
     <div class="fx-badge"><span class="dot"></span> ${_ratesTime?'Live FX · '+_ratesTime.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'Fallback FX rates'} · all totals converted via USD</div>
@@ -5576,14 +5618,15 @@ function sanitizeState(d){
   d=d&&typeof d==='object'?d:{};
   return{
     loans:_arr(d.loans).map(l=>{const o={id:_idf(l.id),name:_s(l.name,80)||'Loan',type:_tok(l.type)||'Other',currency:_curf(l.currency),startDate:_dt(l.startDate),principal:_n(l.principal),rate:_n(l.rate),termMonths:Math.min(600,Math.max(1,parseInt(l.termMonths)||1)),notes:_s(l.notes,300),color:/^#[0-9a-f]{3,8}$/i.test(l.color||'')?l.color:CARD_COLORS[0],archived:!!l.archived,
-      payments:_arr(l.payments).map(p=>({id:_idf(p.id),date:_dt(p.date),amount:_n(p.amount),note:_s(p.note),payType:_tok(p.payType)||PAY_TYPES[0]}))};
+      payments:_arr(l.payments).map(p=>{const x={id:_idf(p.id),date:_dt(p.date),amount:_n(p.amount),note:_s(p.note),payType:_tok(p.payType)||PAY_TYPES[0]};if(p.int!=null&&isFinite(parseFloat(p.int)))x.int=_n(p.int);if(p.fee!=null&&isFinite(parseFloat(p.fee)))x.fee=_n(p.fee);return x;})};
       _opt(o,'closedAt',_dt(l.closedAt));_opt(o,'method',_in(l.method,['emi','gold'],undefined));return o;}),
     expenses:_arr(d.expenses).map(t=>({id:_idf(t.id),name:_s(t.name,80)||'Expenses',currency:_curf(t.currency),month:/^\d{4}-\d{2}$/.test(t.month||'')?t.month:'',budget:_n(t.budget),
       entries:_arr(t.entries).map(e=>({id:_idf(e.id),date:_dt(e.date),amount:_n(e.amount),category:_tok(e.category)||'Other',desc:_s(e.desc),method:_tok(e.method)}))})),
     portfolios:_arr(d.portfolios).map(p=>{const o={id:_idf(p.id),name:_s(p.name,80)||'Portfolio',currency:_curf(p.currency),desc:_s(p.desc,200),kind:_in(p.kind,['stock','crypto'],'stock'),
       holdings:_arr(p.holdings).map(h=>{const x={id:_idf(h.id),ticker:_tok(h.ticker,12).toUpperCase(),name:_s(h.name,80),sector:_tok(h.sector)||'Other',shares:_n(h.shares),buyPrice:_n(h.buyPrice),curPrice:_n(h.curPrice),date:_dt(h.date)};
         _opt(x,'cgId',/^[a-z0-9-]{1,80}$/.test(h.cgId||'')?h.cgId:undefined);if(isFinite(parseFloat(h.dayChangePct)))x.dayChangePct=parseFloat(h.dayChangePct);return x;})};
-      _opt(o,'pricesAt',/^\d{4}-\d{2}-\d{2}T[\d:.]+Z$/.test(p.pricesAt||'')?p.pricesAt:undefined);return o;}),
+      _opt(o,'pricesAt',/^\d{4}-\d{2}-\d{2}T[\d:.]+Z$/.test(p.pricesAt||'')?p.pricesAt:undefined);
+      const cl=_arr(p.closed,3000).map(c=>({id:_idf(c.id),ticker:_tok(c.ticker,14).toUpperCase(),name:_s(c.name,80),shares:_n(c.shares),cost:_n(c.cost),proceeds:_n(c.proceeds),openDate:_dt(c.openDate),closeDate:_dt(c.closeDate),note:_s(c.note,200)}));if(cl.length)o.closed=cl;return o;}),
     incomes:_arr(d.incomes).map(s=>({id:_idf(s.id),name:_s(s.name,80)||'Income',category:_tok(s.category)||'Other',currency:_curf(s.currency),expected:_n(s.expected),
       entries:_arr(s.entries).map(e=>({id:_idf(e.id),date:_dt(e.date),amount:_n(e.amount),desc:_s(e.desc),note:_s(e.note)}))})),
     accounts:_arr(d.accounts,500).map(a=>{const o={id:_idf(a.id),name:_s(a.name,80)||'Account',bank:_s(a.bank,80),country:_in(a.country,COUNTRIES.map(c=>c.c),'OT'),currency:_curf(a.currency),type:_tok(a.type)||'Other',opening:_n(a.opening),openDate:_dt(a.openDate),notes:_s(a.notes,300),archived:!!a.archived,
@@ -6275,7 +6318,152 @@ async function openHolding(pid,hid){
   if(live){const info=await _fhDetail(r.t);if(document.getElementById('m_hold').style.display==='flex')render(info);}
 }
 const _renderPortfoliosBase=renderPortfolios;
-window.renderPortfolios=function(){_renderPortfoliosBase();renderPfScreen();};
+window.renderPortfolios=function(){_renderPortfoliosBase();renderPfTabs();renderPfScreen();renderPfHistory();};
+
+/* ═══ Portfolio navigator: Screen · Accounts · History · All ═══ */
+const PF_VIEWS=[['screen','📟 Screen'],['accounts','🗂 Accounts'],['history','🕘 History'],['all','☰ All']];
+let _pfView=(()=>{try{const v=localStorage.getItem('fintrack_pfview');return PF_VIEWS.some(x=>x[0]===v)?v:'screen';}catch(e){return 'screen';}})();
+function setPfView(v){_pfView=v;try{localStorage.setItem('fintrack_pfview',v);}catch(e){}renderPfTabs();if(v==='screen'||v==='all')renderPfScreen();if(v==='history'||v==='all')renderPfHistory();window.scrollTo({top:0,behavior:'instant'});}
+function renderPfTabs(){
+  const pg=document.getElementById('pg_port'),el=document.getElementById('pf_tabs');if(!pg||!el)return;
+  pg.dataset.pfv=_pfView;
+  const nClosed=state.portfolios.reduce((s,p)=>s+(p.closed||[]).length,0),nHold=state.portfolios.reduce((s,p)=>s+(p.holdings||[]).length,0);
+  const badge={screen:nHold,accounts:state.portfolios.length,history:nClosed,all:''};
+  el.innerHTML=PF_VIEWS.map(([k,l])=>`<button role="tab" aria-selected="${_pfView===k}" class="${_pfView===k?'on':''}" onclick="setPfView('${k}')">${l}${badge[k]!==''?`<span>${badge[k]}</span>`:''}</button>`).join('');
+}
+const _jumpToPf=jumpTo;
+window.jumpTo=function(sec,ref){if(sec==='port'&&/^pc_/.test(ref||'')&&(_pfView==='screen'||_pfView==='history'))setPfView('accounts');return _jumpToPf(sec,ref);};
+
+/* ═══ Portfolio history: closed positions & realised P&L ═══ */
+let _phSort={k:'closeDate',d:-1},_phBroker='all',_phYear='all',_phQ='',_phChart=null;
+function _phRows(){
+  const o=[];
+  state.portfolios.forEach(p=>{const cur=p.currency||'USD';(p.closed||[]).forEach(c=>{
+    const pnl=c.proceeds-c.cost,held=c.openDate&&c.closeDate?Math.round((new Date(c.closeDate)-new Date(c.openDate))/864e5):null;
+    o.push({p,c,cur,t:c.ticker,name:c.name||c.ticker,broker:p.name,sh:c.shares,cost:c.cost,proc:c.proceeds,pnl,ret:c.cost>0?pnl/c.cost*100:null,openDate:c.openDate,closeDate:c.closeDate,held,note:c.note||'',
+      cU:toUSD(c.cost,cur),prU:toUSD(c.proceeds,cur),pU:toUSD(pnl,cur)});
+  });});
+  return o;
+}
+function renderPfHistory(){
+  const el=document.getElementById('pf_hist');if(!el)return;
+  if(_phChart){_phChart.destroy();_phChart=null;}
+  if(_pfView!=='history'&&_pfView!=='all'){el.innerHTML='';return;}
+  const all=_phRows(),open=_pfRows();
+  if(!all.length){el.innerHTML=`<div class="pf-card" style="margin-bottom:18px"><div class="empty-state" style="padding:26px"><div class="es-icon">🕘</div><div class="es-title">No closed positions yet</div><div class="es-sub">Sold or written-off holdings appear here with their realised profit or loss.</div></div></div>`;return;}
+  const brokers=[...new Set(all.map(r=>r.broker))],years=[...new Set(all.map(r=>(r.closeDate||'').slice(0,4)).filter(Boolean))].sort().reverse();
+  window._phBrokers=brokers;
+  if(_phBroker!=='all'&&!brokers.includes(_phBroker))_phBroker='all';
+  if(_phYear!=='all'&&!years.includes(_phYear))_phYear='all';
+  const q=_phQ.trim().toLowerCase();
+  const rows=all.filter(r=>(_phBroker==='all'||r.broker===_phBroker)&&(_phYear==='all'||(r.closeDate||'').startsWith(_phYear))&&(!q||`${r.t} ${r.name} ${r.broker} ${r.note}`.toLowerCase().includes(q)));
+  const rz=rows.reduce((s,r)=>s+r.pU,0),inv=rows.reduce((s,r)=>s+r.cU,0),proc=rows.reduce((s,r)=>s+r.prU,0);
+  const wins=rows.filter(r=>r.pU>0.005),losses=rows.filter(r=>r.pU<-0.005);
+  const best=rows.slice().sort((a,b)=>b.pU-a.pU)[0],worst=rows.slice().sort((a,b)=>a.pU-b.pU)[0];
+  const openRows=open.filter(r=>_phBroker==='all'||r.broker===_phBroker),unr=openRows.reduce((s,r)=>s+r.pU,0);
+  const helds=rows.map(r=>r.held).filter(x=>x!=null);
+  const byB={};all.forEach(r=>{const b=byB[r.broker]||(byB[r.broker]={rz:0,n:0,cur:r.cur,nat:0});b.rz+=r.pU;b.nat+=r.pnl;b.n++;});
+  open.forEach(r=>{const b=byB[r.broker];if(b)b.unr=(b.unr||0)+r.pU;});
+  const sk=_phSort.k;rows.sort((a,b)=>{const x=a[sk],y=b[sk];if(typeof x==='string'||typeof y==='string')return _phSort.d*String(x||'').localeCompare(String(y||''));return _phSort.d*((x==null?-Infinity:x)-(y==null?-Infinity:y));});
+  const th=(k,l)=>`<th class="${_phSort.k===k?'on':''}" onclick="phSort('${k}')">${l}${_phSort.k===k?(_phSort.d<0?' ▾':' ▴'):''}</th>`;
+  const kp=(l,v,s,c='')=>`<div class="pf-kpi"><i>${l}</i><b class="${c}">${v}</b>${s?`<small>${s}</small>`:''}</div>`;
+  el.innerHTML=`<div class="pf">
+    <div class="pf-h"><h3>🕘 Trading history<span>${_plural(all.length,'closed position')} across ${_plural(brokers.length,'account')}</span></h3>
+      <div class="pf-mkts"><span class="pf-seg">${['USD','INR'].map(c=>`<button class="${_pfCur===c?'on':''}" onclick="_pfCur='${c}';renderPfScreen();renderPfHistory()">${c}</button>`).join('')}</span></div></div>
+    <div class="pf-hero">
+      <div class="pf-card">
+        <div class="pf-mini-h">Realised P&amp;L${_phYear!=='all'?' · '+_phYear:''}${_phBroker!=='all'?' · '+esc(_phBroker):''}</div>
+        <div class="pf-val ${_pfCls(rz)}">${_pfS(rz)}</div>
+        <div class="pf-chg"><span class="${_pfCls(rz)}">${inv>0?_pfPct(rz/inv*100):'—'} on ${_pfM(inv,0)} invested</span><span style="color:var(--ink3)">${_pfM(proc,0)} got back</span></div>
+        <div class="pf-kpis">
+          ${kp('Win rate',rows.length?Math.round(wins.length/rows.length*100)+'%':'—',`${wins.length} wins · ${losses.length} losses`)}
+          ${kp('Best trade',best?esc(best.t):'—',best?_pfS(best.pU):'',best&&best.pU>=0?'pf-up':'')}
+          ${kp('Worst trade',worst?esc(worst.t):'—',worst?_pfS(worst.pU):'',worst&&worst.pU<0?'pf-dn':'')}
+          ${kp('Avg holding',helds.length?Math.round(helds.reduce((a,b)=>a+b,0)/helds.length)+' days':'—','open → close')}
+        </div>
+      </div>
+      <div class="pf-card">
+        <div class="pf-card-h"><b>Lifetime by account</b><span>realised + still-open unrealised</span></div>
+        ${Object.entries(byB).map(([b,x])=>{const tot=x.rz+(x.unr||0);return `<div class="pf-mv" onclick="_phBroker=_phBrokers[${brokers.indexOf(b)}];renderPfHistory()"><span><b>${esc(b)}</b> <small style="color:var(--ink3)">${x.n} closed</small></span><span style="text-align:right"><b class="${_pfCls(tot)}">${_pfS(tot,0)}</b><small style="display:block;color:var(--ink3);font-size:10px">realised ${_pfS(x.rz,0)} · open ${_pfS(x.unr||0,0)}</small></span></div>`;}).join('')}
+        <div class="pf-mv" style="cursor:default"><span><b>All accounts</b></span><span style="text-align:right"><b class="${_pfCls(all.reduce((s,r)=>s+r.pU,0)+open.reduce((s,r)=>s+r.pU,0))}">${_pfS(all.reduce((s,r)=>s+r.pU,0)+open.reduce((s,r)=>s+r.pU,0),0)}</b><small style="display:block;color:var(--ink3);font-size:10px">lifetime investing result</small></span></div>
+      </div>
+    </div>
+    <div class="pf-card">
+      <div class="pf-card-h"><b>📉 Cumulative realised P&amp;L</b><span>by close date · bars = each closed position</span></div>
+      <div class="ch-wrap h240"><canvas id="ph_cum"></canvas></div>
+    </div>
+    <div class="pf-card">
+      <div class="pf-tools">
+        <div class="hist-search"><span>⌕</span><input type="search" id="ph_q" value="${esc(_phQ)}" placeholder="Search ticker, name, note…" oninput="_phQ=this.value;phTable()" autocomplete="off"></div>
+        <div class="filter-group">${['all',...brokers].map((b,i)=>`<button class="filter-chip ${_phBroker===b?'active':''}" onclick="_phBroker=${i?`_phBrokers[${i-1}]`:"'all'"};renderPfHistory()">${b==='all'?'All accounts':esc(b)}</button>`).join('')}</div>
+        <div class="filter-group">${['all',...years].map(y=>`<button class="filter-chip ${_phYear===y?'active':''}" onclick="_phYear='${y}';renderPfHistory()">${y==='all'?'All years':y}</button>`).join('')}</div>
+      </div>
+      <div class="pf-tbl-wrap"><table class="pf-tbl"><thead><tr>${th('t','Position')}${th('sh','Qty')}${th('openDate','Opened')}${th('closeDate','Closed')}${th('held','Held')}${th('cU','Invested')}${th('prU','Got back')}${th('pU','P&amp;L')}${th('ret','Return')}</tr></thead>
+        <tbody>${rows.map(r=>`<tr title="${esc(r.note)}">
+          <td><div class="pf-symc"><span class="pf-sym" style="background:linear-gradient(135deg,hsl(${_pfHue(r.t)} 55% 45%),hsl(${(_pfHue(r.t)+40)%360} 55% 32%));opacity:.85">${esc(r.t.slice(0,6))}</span><div><b>${esc(r.name)}</b><small>${esc(r.broker)}${r.note?' · '+esc(r.note):''}</small></div></div></td>
+          <td>${+r.sh.toFixed(4)}</td><td>${r.openDate?fmtDate(r.openDate):'—'}</td><td>${r.closeDate?fmtDate(r.closeDate):'—'}</td><td>${r.held!=null?r.held+'d':'—'}</td>
+          <td>${fmt(r.cost,r.cur)}</td><td>${fmt(r.proc,r.cur)}</td>
+          <td class="${_pfCls(r.pnl)}">${r.pnl>=0?'+':'−'}${fmt(Math.abs(r.pnl),r.cur)}${r.cur!==_pfCur?`<small style="display:block;font-size:10px;color:var(--ink3)">${_pfS(r.pU)}</small>`:''}</td>
+          <td class="${_pfCls(r.ret)}">${_pfPct(r.ret)}</td></tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--ink3)">No closed positions match.</td></tr>'}</tbody>
+        <tfoot><tr><td>${_plural(rows.length,'position')}</td><td></td><td></td><td></td><td></td><td>${_pfM(inv)}</td><td>${_pfM(proc)}</td><td class="${_pfCls(rz)}">${_pfS(rz)}</td><td class="${_pfCls(rz)}">${inv>0?_pfPct(rz/inv*100):'—'}</td></tr></tfoot></table></div>
+    </div>
+  </div>`;
+  setTimeout(()=>{
+    const cv=document.getElementById('ph_cum');if(!cv||typeof Chart==='undefined')return;
+    const fx=_pfFx(_pfCur),ev=rows.filter(r=>r.closeDate).sort((a,b)=>a.closeDate.localeCompare(b.closeDate));let run=0;
+    const cum=ev.map(r=>{run+=r.pU;return +(run*fx).toFixed(2);});
+    _phChart=new Chart(cv,{data:{labels:ev.map(r=>`${r.t} · ${new Date(r.closeDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'})}`),datasets:[
+      {type:'line',label:'Cumulative realised',data:cum,borderColor:'#8B5CF6',backgroundColor:'#8B5CF622',fill:true,stepped:true,pointRadius:2,borderWidth:2,order:0},
+      {type:'bar',label:'Position P&L',data:ev.map(r=>+(r.pU*fx).toFixed(2)),backgroundColor:ev.map(r=>r.pU>=0?'#10B981CC':'#F43F5ECC'),borderRadius:3,order:1}]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{boxWidth:8,font:{size:10}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${_pfS(c.raw/fx)}`}}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:10}},y:{ticks:{font:{size:9},callback:v=>_pfM(v/fx,0)}}}}});
+  },40);
+}
+function phSort(k){_phSort=_phSort.k===k?{k,d:-_phSort.d}:{k,d:/^(t|openDate)$/.test(k)?1:-1};renderPfHistory();}
+function phTable(){const pos=document.getElementById('ph_q')?.selectionStart;renderPfHistory();const i=document.getElementById('ph_q');if(i){i.focus();try{i.setSelectionRange(pos,pos);}catch(e){}}}
+
+/* ═══ Period filters (year / month) for summary cards ═══ */
+const _per={inc:{p:'ytd',y:'',m:''},exp:{p:'ytd',y:'',m:''},acct:{p:'30d',y:'',m:''}};
+const _MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function _perRange(sec){
+  const s=_per[sec],n=new Date(),Y=n.getFullYear(),M=n.getMonth(),iso=d=>_iso(d),today=iso(n);
+  if(s.p==='custom'&&s.y){
+    if(s.m){const m=+s.m-1;return{from:iso(new Date(+s.y,m,1)),to:iso(new Date(+s.y,m+1,0)),label:`${_MON[m]} ${s.y}`,months:1};}
+    return{from:`${s.y}-01-01`,to:`${s.y}-12-31`,label:s.y,months:+s.y===Y?M+1:12};
+  }
+  switch(s.p){
+    case '30d':return{from:iso(new Date(Date.now()-30*864e5)),to:today,label:'last 30 days',months:1};
+    case 'mtd':return{from:iso(new Date(Y,M,1)),to:today,label:'this month',months:1};
+    case 'lm':return{from:iso(new Date(Y,M-1,1)),to:iso(new Date(Y,M,0)),label:'last month',months:1};
+    case 'ytd':return{from:`${Y}-01-01`,to:today,label:`${Y} so far`,months:M+1};
+    case 'ly':return{from:`${Y-1}-01-01`,to:`${Y-1}-12-31`,label:String(Y-1),months:12};
+    default:return{from:'',to:'',label:'all time',months:0};
+  }
+}
+const _inPer=(r,d)=>!!d&&(!r.from||d>=r.from)&&(!r.to||d<=r.to);
+function _perYears(sec){
+  const ds=sec==='inc'?state.incomes.flatMap(s=>(s.entries||[]).map(e=>e.date)):sec==='exp'?state.expenses.flatMap(t=>(t.entries||[]).map(e=>e.date)):(state.accounts||[]).flatMap(a=>(a.txns||[]).map(t=>t.date));
+  return [...new Set(ds.filter(Boolean).map(d=>d.slice(0,4)))].sort().reverse();
+}
+function setPer(sec,k,v){
+  const s=_per[sec];
+  if(k==='p'){s.p=v;s.y='';s.m='';}
+  else if(k==='y'){s.y=v;if(!v){s.p='all';s.m='';}else s.p='custom';}
+  else if(k==='m'){s.m=v;if(!s.y)s.y=String(new Date().getFullYear());s.p='custom';}
+  ({inc:renderIncomeSummary,exp:renderExpenseSummary,acct:renderAcctSummary})[sec]();
+}
+function _perBar(sec){
+  const s=_per[sec],yrs=_perYears(sec),presets=[['30d','30 days'],['mtd','This month'],['lm','Last month'],['ytd','This year'],['ly','Last year'],['all','All time']];
+  return `<div class="per-bar" onclick="event.stopPropagation()">
+    <div class="per-chips">${presets.map(([k,l])=>`<button class="${s.p===k?'on':''}" onclick="setPer('${sec}','p','${k}')">${l}</button>`).join('')}</div>
+    <select class="per-sel" onchange="setPer('${sec}','y',this.value)" aria-label="Year"><option value="">Year…</option>${yrs.map(y=>`<option${s.p==='custom'&&s.y===y?' selected':''}>${y}</option>`).join('')}</select>
+    <select class="per-sel" onchange="setPer('${sec}','m',this.value)" aria-label="Month"><option value="">${s.p==='custom'&&s.y?'Whole year':'Month…'}</option>${_MON.map((m,i)=>`<option value="${String(i+1).padStart(2,'0')}"${s.p==='custom'&&s.m===String(i+1).padStart(2,'0')?' selected':''}>${m}</option>`).join('')}</select>
+  </div>`;
+}
+function _perList(map,total,color){
+  const e=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  return e.length?`<div class="per-list">${e.map(([k,v])=>`<div class="per-row"><span>${esc(k)}</span><b>${fmtUSD(v,0)}</b><i><em style="width:${total>0?Math.max(2,v/total*100):0}%;background:${color}"></em></i><small>${total>0?(v/total*100).toFixed(0):0}%</small></div>`).join('')}</div>`:'';
+}
 
 /* ═══ Section insights (Expenses · Income · Loans) ═══ */
 function _secIns(sec,list){
