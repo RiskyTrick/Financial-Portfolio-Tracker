@@ -1606,7 +1606,7 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
       </div>
       <div class="fg2">
         <div class="fg"><label class="fg-label">Principal Amount</label><div class="fi-wrap"><span class="fi-pre" id="nl_sym">$</span><input class="fi pre" id="nl_prin" type="number" min="0" step="0.01" placeholder="0.00"></div></div>
-        <div class="fg"><label class="fg-label">Annual Interest Rate (%)</label><div class="fi-wrap"><input class="fi suf" id="nl_rate" type="number" min="0.01" max="99.99" step="0.01" placeholder="5.25"><span class="fi-suf">%</span></div></div>
+        <div class="fg"><label class="fg-label">Annual Interest Rate (%)</label><div class="fi-wrap"><input class="fi suf" id="nl_rate" type="number" min="0" max="99.99" step="0.01" placeholder="5.25 (0 for interest-free)"><span class="fi-suf">%</span></div></div>
       </div>
       <div class="fg2">
         <div class="fg"><label class="fg-label">Term (Months)</label><input class="fi" id="nl_term" type="number" min="1" max="600" step="1" placeholder="36"></div>
@@ -1636,7 +1636,7 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
       </div>
       <div class="fg2">
         <div class="fg"><label class="fg-label">Principal Amount</label><div class="fi-wrap"><span class="fi-pre" id="el_sym">$</span><input class="fi pre" id="el_prin" type="number" min="0" step="0.01" placeholder="0.00"></div></div>
-        <div class="fg"><label class="fg-label">Annual Interest Rate (%)</label><div class="fi-wrap"><input class="fi suf" id="el_rate" type="number" min="0.01" max="99.99" step="0.01" placeholder="5.25"><span class="fi-suf">%</span></div></div>
+        <div class="fg"><label class="fg-label">Annual Interest Rate (%)</label><div class="fi-wrap"><input class="fi suf" id="el_rate" type="number" min="0" max="99.99" step="0.01" placeholder="5.25 (0 for interest-free)"><span class="fi-suf">%</span></div></div>
       </div>
       <div class="fg2">
         <div class="fg"><label class="fg-label">Term (Months)</label><input class="fi" id="el_term" type="number" min="1" max="600" step="1" placeholder="36"></div>
@@ -2690,7 +2690,7 @@ function buildLoanCard(loan,idx){
   </div>
   <div class="fg2">
     <div class="fg"><label class="fg-label">Principal Amount</label><div class="fi-wrap"><span class="fi-pre">${symOf(cur)}</span><input class="fi pre" type="number" min="0" step="0.01" value="${loan.principal||''}" placeholder="0.00" onchange="updLoan('${loan.id}','principal',this.value)"></div></div>
-    <div class="fg"><label class="fg-label">Annual Interest Rate</label><div class="fi-wrap"><input class="fi suf" type="number" min="0.01" max="99.99" step="0.01" value="${parseFloat(loan.rate||0).toFixed(2)}" onchange="updLoan('${loan.id}','rate',this.value)"><span class="fi-suf">%</span></div></div>
+    <div class="fg"><label class="fg-label">Annual Interest Rate</label><div class="fi-wrap"><input class="fi suf" type="number" min="0" max="99.99" step="0.01" value="${parseFloat(loan.rate||0).toFixed(2)}" onchange="updLoan('${loan.id}','rate',this.value)"><span class="fi-suf">%</span></div></div>
   </div>
   <div class="fg2">
     <div class="fg"><label class="fg-label">Term (Months)</label><input class="fi" type="number" min="1" max="600" value="${loan.termMonths||''}" placeholder="36" onchange="updLoan('${loan.id}','termMonths',this.value)"></div>
@@ -2799,7 +2799,7 @@ function createLoan(){
   const notes=document.getElementById('nl_notes').value.trim();
   if(!name){toast('Enter a loan name','err');return;}
   if(!prin||prin<=0){toast('Enter a valid principal amount','err');return;}
-  if(!rate||rate<=0||rate>=100){toast('Enter a valid interest rate (0.01–99.99%)','err');return;}
+  if(isNaN(rate)||rate<0||rate>=100){toast('Enter a valid interest rate (0–99.99%)','err');return;}
   if(!term||term<=0){toast('Enter a valid term in months','err');return;}
   state.loans.push({id:uid(),name,type,currency:cur,startDate:start||'',principal:prin,rate:Math.round(rate*100)/100,termMonths:term,notes,payments:[],color:CARD_COLORS[state.loans.length%CARD_COLORS.length],archived:false,method:document.getElementById('nl_method')?.value==='gold'?'gold':'emi'});
   saveState();closeModal('m_newloan');renderLoans();refreshDash();
@@ -2880,7 +2880,7 @@ function applyEditLoan(){
   const prin=parseFloat(document.getElementById('el_prin').value);
   if(!prin||prin<=0){toast('Enter a valid principal amount','err');return;}
   const rate=parseFloat(document.getElementById('el_rate').value);
-  if(!rate||rate<=0||rate>=100){toast('Enter a valid interest rate','err');return;}
+  if(isNaN(rate)||rate<0||rate>=100){toast('Enter a valid interest rate (0–99.99%)','err');return;}
   const term=parseInt(document.getElementById('el_term').value);
   if(!term||term<=0){toast('Enter a valid term in months','err');return;}
   l.name=name;
