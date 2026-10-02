@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://open.er-api.com https://api.coingecko.com https://finnhub.io https://www.alphavantage.co; frame-src https://*.firebaseapp.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.finnhub.io; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://open.er-api.com https://api.coingecko.com https://finnhub.io https://www.alphavantage.co; frame-src https://*.firebaseapp.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Portfolio Tracker</title>
 <meta name="theme-color" content="#F3F5FB">
@@ -1212,6 +1212,87 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
 .ht-scroll{overflow-x:auto}
 .hm-years{display:flex;gap:4px;flex-wrap:wrap}
 /* Price-feed modal */
+/* ── Portfolio screen ── */
+.pf{display:grid;gap:14px;margin-bottom:18px;min-width:0}
+.pf-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pf-h h3{margin:0;font:600 15px var(--serif);color:var(--ink)}.pf-h h3 span{font:500 11px var(--sans,inherit);color:var(--ink3);margin-left:8px}
+.pf-tape{overflow:hidden;border:1px solid var(--border);border-radius:12px;background:var(--surface);-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.pf-tape-in{display:inline-flex;gap:28px;padding:9px 14px;white-space:nowrap;animation:pfTape 45s linear infinite}
+.pf-tape:hover .pf-tape-in{animation-play-state:paused}
+@keyframes pfTape{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.pf-tape-in{animation:none}}
+.pf-tk{font:600 11.5px var(--mono);display:inline-flex;gap:7px;align-items:center;cursor:pointer;color:var(--ink2)}
+.pf-tk b{color:var(--ink)}
+.pf-up{color:#10B981}.pf-dn{color:#F43F5E}.pf-flat{color:var(--ink3)}
+.pf-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;min-width:0}
+.pf-card-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.pf-card-h b{font-size:12.5px;color:var(--ink)}.pf-card-h span{font-size:10.5px;color:var(--ink3)}
+.pf-hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
+.pf-val{font:600 36px/1.05 var(--serif);color:var(--ink);letter-spacing:-.02em}
+.pf-chg{font:600 13px var(--mono);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+.pf-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.pf-kpi{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:9px 11px;min-width:0}
+.pf-kpi i{display:block;font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
+.pf-kpi b{display:block;font:600 14px var(--mono);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-kpi small{display:block;font-size:10px;color:var(--ink3)}
+.pf-mkts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pf-pill{font-size:10.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--border);color:var(--ink2);background:var(--surface2);display:inline-flex;align-items:center;gap:6px}
+.pf-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ink4,#94A3B8)}
+.pf-pill.open::before{background:#10B981;box-shadow:0 0 6px #10B981}
+.pf-seg{display:inline-flex;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+.pf-seg button{font-size:10.5px;padding:3px 10px;background:none;border:0;color:var(--ink2);cursor:pointer}
+.pf-seg button.on{background:var(--violet2,#7C3AED);color:#fff}
+.pf-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--surface3)}
+.pf-bar i{display:block;height:100%}
+.pf-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:11px;color:var(--ink2)}
+.pf-legend span::before{content:'';display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--c);margin-right:5px}
+.pf-grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.pf-tm{position:relative;height:300px;border-radius:12px;overflow:hidden;background:var(--surface2)}
+.pf-tile{position:absolute;box-sizing:border-box;border:2px solid var(--surface);border-radius:8px;padding:6px 8px;color:#fff;overflow:hidden;cursor:pointer;transition:filter .2s;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.pf-tile:hover{filter:brightness(1.18)}
+.pf-tile b{display:block;font:700 12.5px var(--mono)}.pf-tile span{display:block;font:600 10.5px var(--mono);opacity:.92}
+.pf-movers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pf-mv{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);margin-bottom:6px;cursor:pointer;font-size:12px}
+.pf-mv b{font-family:var(--mono)}
+.pf-mini-h{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin:2px 0 8px}
+.pf-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.pf-tools .hist-search{flex:1 1 200px}
+.pf-tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+.pf-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:880px}
+.pf-tbl th{position:sticky;top:0;background:var(--surface2);font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);text-align:right;padding:9px 10px;cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1px solid var(--border)}
+.pf-tbl th:first-child,.pf-tbl td:first-child{text-align:left}
+.pf-tbl th.on{color:var(--ink)}
+.pf-tbl td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--border);font-family:var(--mono);white-space:nowrap}
+.pf-tbl tbody tr{cursor:pointer;transition:background-color .15s}
+.pf-tbl tbody tr:hover{background:var(--surface2)}
+.pf-tbl tfoot td{font-weight:700;background:var(--surface2)}
+.pf-symc{display:flex;align-items:center;gap:10px;font-family:var(--sans,inherit)}
+.pf-sym{flex:none;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:10px;font:700 9px var(--mono);color:#fff;letter-spacing:-.02em}
+.pf-symc b{display:block;font-size:12.5px;color:var(--ink)}.pf-symc small{display:block;font-size:10.5px;color:var(--ink3);max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.pf-w{width:70px;height:5px;background:var(--surface3);border-radius:3px;display:inline-block;vertical-align:middle;margin-left:6px}
+.pf-w i{display:block;height:100%;background:linear-gradient(90deg,#8B5CF6,#EC4899);border-radius:3px}
+.pf-modal{max-width:620px}
+.pf-dh{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.pf-dh img{width:44px;height:44px;border-radius:12px;background:#fff;object-fit:contain}
+.pf-dpx{font:600 30px/1 var(--serif);color:var(--ink)}
+.pf-range{position:relative;height:6px;border-radius:4px;background:linear-gradient(90deg,#F43F5E,#F59E0B,#10B981);margin:16px 0 4px}
+.pf-range i{position:absolute;top:-5px;width:4px;height:16px;border-radius:2px;background:var(--ink);transform:translateX(-50%);box-shadow:0 0 0 2px var(--surface)}
+.pf-range-l{display:flex;justify-content:space-between;font:500 10.5px var(--mono);color:var(--ink3)}
+.pf-dgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+@media(max-width:900px){.pf-hero,.pf-grid2{grid-template-columns:minmax(0,1fr)}.pf-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.pf-val{font-size:30px}.pf-dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.pf-movers{grid-template-columns:1fr}.pf-tm{height:240px}}
+/* Bank ledger month dropdowns */
+details.lg-grp>summary{list-style:none;cursor:pointer;user-select:none}
+details.lg-grp>summary::-webkit-details-marker{display:none}
+.lg-chev{display:inline-block;margin-right:8px;transition:transform .2s;color:var(--ink3);font-family:var(--mono)}
+details.lg-grp[open] .lg-chev{transform:rotate(90deg)}
+.lg-month small{font:500 10.5px var(--mono);color:var(--ink3);margin-left:8px}
+.lg-ctl{display:inline-flex;gap:6px;margin-left:10px}
+.lg-ctl button{font-size:10.5px;background:none;border:1px solid var(--border);border-radius:999px;padding:2px 9px;color:var(--ink2);cursor:pointer}
+.lg-ctl button:hover{border-color:var(--ink3)}
+/* Section insights */
+.sec-ins{margin:0 0 18px}
+.sec-ins-h{font-size:12px;font-weight:700;color:var(--ink);margin:0 0 10px}.sec-ins-h span{font-weight:500;font-size:10.5px;color:var(--ink3);margin-left:6px}
 .mkt-note{font-size:11.5px;color:var(--ink3);line-height:1.5;margin-bottom:12px}
 .mkt-links{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;margin:-2px 0 10px}
 .mkt-links a{color:var(--violet2,#7C3AED);text-decoration:none}.mkt-links a:hover{text-decoration:underline}
@@ -1467,6 +1548,7 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
   </div>
   <div class="sec-body">
     <div class="sec-accent" style="color:var(--violet2)"></div>
+    <div id="pf_screen"></div>
     <!-- Portfolio Summary Tracker -->
     <div id="port_summary" style="display:none"></div>
     <div id="port_filters" class="filter-bar" style="display:none"></div>
@@ -1575,6 +1657,14 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
 </div><!-- /main-area -->
 
 <!-- ═══════════ MODALS ═══════════ -->
+
+<!-- HOLDING DETAIL -->
+<div class="modal-overlay" id="m_hold" style="display:none" onclick="closeOut(event,'m_hold')">
+  <div class="modal pf-modal">
+    <div class="modal-head"><div class="modal-title" id="hd_title">Holding</div><button class="btn btn-ghost btn-icon" onclick="closeModal('m_hold')">✕</button></div>
+    <div class="modal-body" id="hd_body"></div>
+  </div>
+</div>
 
 <!-- LIVE PRICE FEEDS -->
 <div class="modal-overlay" id="m_mkt" style="display:none" onclick="closeOut(event,'m_mkt')">
@@ -2145,8 +2235,8 @@ let _saveDebounce=null;
 let _cloudBlocked=false;
 const _skFor=uid=>SK+'_'+uid;
 const _clean=d=>typeof sanitizeState==='function'?sanitizeState(d):{loans:[],expenses:[],portfolios:[],incomes:[],accounts:[]};
-function _applyData(d){const c=_clean(d);state.loans=c.loans;state.expenses=c.expenses;state.portfolios=c.portfolios;state.incomes=c.incomes;state.accounts=c.accounts;state.settings=c.settings||{};}
-const _snapshot=()=>({v:2,loans:state.loans,expenses:state.expenses,portfolios:state.portfolios,incomes:state.incomes,accounts:state.accounts||[],settings:state.settings||{}});
+function _applyData(d){const c=_clean(d);state.loans=c.loans;state.expenses=c.expenses;state.portfolios=c.portfolios;state.incomes=c.incomes;state.accounts=c.accounts;state.settings=c.settings||{};state.pfHist=c.pfHist||[];}
+const _snapshot=()=>({v:2,loans:state.loans,expenses:state.expenses,portfolios:state.portfolios,incomes:state.incomes,accounts:state.accounts||[],settings:state.settings||{},pfHist:state.pfHist||[]});
 
 function saveState(){
   if(_currentUser){
@@ -4859,21 +4949,32 @@ function renderLedger(id){
   if(!rows.length){el.innerHTML=`<div class="empty-state" style="padding:22px"><div class="es-icon">🔍</div><div class="es-sub">No transactions match these filters.</div></div>`;return;}
   const mt={};rows.forEach(t=>{const k=t.date.slice(0,7),g=mt[k]||(mt[k]={i:0,o:0,n:0});g.n++;if(t.signed>=0)g.i+=t.signed;else g.o-=t.signed;});
   const tin=rows.reduce((s,t)=>s+Math.max(0,t.signed),0),tout=rows.reduce((s,t)=>s+Math.max(0,-t.signed),0);
-  let html=`<div class="lg-meta">${rows.length===m.count?`${m.count} transactions`:`${rows.length} of ${m.count} transactions`} · <span class="c-pos">+${fmt(tin,cur)}</span> · <span class="c-neg">−${fmt(tout,cur)}</span></div>`,lastM='';
-  rows.slice(0,v.limit).forEach(t=>{
-    const k=t.date.slice(0,7);
-    if(k!==lastM){lastM=k;const g=mt[k],net=g.i-g.o;
-      html+=`<div class="lg-month"><b>${new Date(k+'-01T00:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</b><span class="lg-mt"><span class="c-pos">+${fmt(g.i,cur,0)}</span><span class="c-neg">−${fmt(g.o,cur,0)}</span><span class="${net>-0.5?'c-pos':'c-neg'}">net ${net>-0.5?'+':'−'}${fmt(Math.abs(net),cur,0)}</span><span class="lg-close">close ${fmt(monthEnd[k],cur,0)}</span></span></div>`;}
-    const cat=txnCat(t),pos=t.signed>=0,title=prettyDesc(t.desc)||t.type,dt=new Date(t.date+'T00:00:00');
-    html+=`<button type="button" class="lg-row" onclick="openTxnEdit('${a.id}','${t.id}')" title="${esc(t.desc||t.type)}">
+  const G={},keys=[];rows.forEach(t=>{const k=t.date.slice(0,7);if(!G[k]){G[k]=[];keys.push(k);}G[k].push(t);});_lgGroups[id]=G;
+  const fkey=`${q}|${from}|${v.flow}|${v.cat}`,filtered=!!(q||from||v.flow!=='all'||v.cat!=='all');
+  if(!v.open||v._fkey!==fkey){v.open=new Set(filtered&&rows.length<=150?keys:keys.slice(0,1));v._fkey=fkey;}
+  let html=`<div class="lg-meta">${rows.length===m.count?`${m.count} transactions`:`${rows.length} of ${m.count} transactions`} · <span class="c-pos">+${fmt(tin,cur)}</span> · <span class="c-neg">−${fmt(tout,cur)}</span> · ${_plural(keys.length,'month')}<span class="lg-ctl"><button type="button" onclick="lgAll('${id}',1)">▾ Expand all</button><button type="button" onclick="lgAll('${id}',0)">▸ Collapse all</button></span></div>`;
+  keys.forEach(k=>{
+    const g=mt[k],net=g.i-g.o,op=v.open.has(k);
+    html+=`<details class="lg-grp" data-k="${k}"${op?' open':''}><summary class="lg-month"><b><span class="lg-chev">›</span>${new Date(k+'-01T00:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'})}<small>${_plural(g.n,'txn')}</small></b><span class="lg-mt"><span class="c-pos">+${fmt(g.i,cur,0)}</span><span class="c-neg">−${fmt(g.o,cur,0)}</span><span class="${net>-0.5?'c-pos':'c-neg'}">net ${net>-0.5?'+':'−'}${fmt(Math.abs(net),cur,0)}</span><span class="lg-close">close ${fmt(monthEnd[k],cur,0)}</span></span></summary><div class="lg-body">${op?G[k].map(t=>_lgRow(a,t,cur)).join(''):''}</div></details>`;
+  });
+  el.innerHTML=html;
+  // Rows are rendered lazily the first time a month is opened
+  el.querySelectorAll('details.lg-grp').forEach(d=>d.addEventListener('toggle',()=>{
+    const k=d.dataset.k;
+    if(d.open){v.open.add(k);const b=d.querySelector('.lg-body');if(!b.childElementCount)b.innerHTML=(_lgGroups[id][k]||[]).map(t=>_lgRow(a,t,cur)).join('');}
+    else v.open.delete(k);
+  }));
+}
+const _lgGroups={};
+function lgAll(id,open){const v=_av(id);v.open=new Set(open?Object.keys(_lgGroups[id]||{}):[]);renderLedger(id);}
+function _lgRow(a,t,cur){
+  const cat=txnCat(t),pos=t.signed>=0,title=prettyDesc(t.desc)||t.type,dt=new Date(t.date+'T00:00:00');
+  return `<button type="button" class="lg-row" onclick="openTxnEdit('${a.id}','${t.id}')" title="${esc(t.desc||t.type)}">
       <span class="lg-date"><b>${dt.getDate()}</b>${dt.toLocaleDateString('en-US',{weekday:'short'})}</span>
       <span class="lg-ic" data-cat="${cat}">${BANK_CATS[cat]}</span>
       <span class="lg-main"><span class="lg-t">${esc(title)}</span><span class="lg-s"><em>${cat}</em>${t.type!=='Deposit'&&t.type!=='Withdrawal'?' · '+esc(t.type):''}${t.linkId?' · ⇄ transfer':''}${t.fx?' · '+esc(t.fx):''}</span></span>
       <span class="lg-amt ${pos?'pos':'neg'}">${pos?'+':'−'}${fmt(Math.abs(t.signed),cur)}<small>bal ${fmt(t.balAfter,cur)}</small></span>
     </button>`;
-  });
-  if(rows.length>v.limit)html+=`<button class="btn btn-outline tl-more" onclick="_av('${a.id}').limit+=120;renderLedger('${a.id}')">Show more · ${rows.length-v.limit} older</button>`;
-  el.innerHTML=html;
 }
 function buildAcctInsights(id){
   const a=_acct(id),el=document.getElementById('ains_'+id);if(!a||!el)return;
@@ -5489,6 +5590,7 @@ function sanitizeState(d){
       txns:_arr(a.txns,20000).map(t=>{const x={id:_idf(t.id),date:_dt(t.date),type:_in(t.type,Object.keys(TXN_TYPES),'Deposit'),amount:_n(t.amount),desc:_s(t.desc)};_opt(x,'linkId',_RX_ID.test(t.linkId||'')?t.linkId:undefined);_opt(x,'fx',_s(t.fx,60));_opt(x,'cat',typeof BANK_CATS!=='undefined'&&BANK_CATS[t.cat]?t.cat:undefined);return x;})};
       _opt(o,'closedAt',_dt(a.closedAt));return o;}),
     settings:(()=>{const s=d.settings&&typeof d.settings==='object'?d.settings:{},k=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(v)?v:'';return{finnhub:k(s.finnhub),alphav:k(s.alphav)};})(),
+    pfHist:_arr(d.pfHist,1500).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.d||'')).map(x=>({d:x.d,v:_n(x.v),c:_n(x.c)})),
   };
 }
 
@@ -5944,6 +6046,311 @@ window.renderAll=function(){
   _renderAllSpans();renderDataSpans();
   if(!_pxTimer&&_authed()){_pxTimer=setInterval(_autoPrices,60e3);setTimeout(_autoPrices,3000);}
 };
+
+/* ═══ Portfolio screen — every holding across brokers in one stock-app view ═══ */
+let _pfSort={k:'vU',d:-1},_pfQ='',_pfBroker='all',_pfCur='USD',_pfHeat='day',_pfCharts={};
+const _pfFx=c=>c==='USD'?1:(_exchangeRates[c]||1);
+const _pfM=(usd,d=2)=>fmt(usd*_pfFx(_pfCur),_pfCur,d);
+const _pfS=(usd,d=2)=>(usd>=0?'+':'−')+_pfM(Math.abs(usd),d);
+const _pfCls=v=>v==null?'pf-flat':v>0.0001?'pf-up':v<-0.0001?'pf-dn':'pf-flat';
+const _pfPct=v=>v==null?'—':(v>=0?'+':'')+v.toFixed(2)+'%';
+function _pfHue(t){let h=0;for(const ch of String(t))h=(h*31+ch.charCodeAt(0))%360;return h;}
+function _pfRows(){
+  const rows=[];
+  state.portfolios.forEach(p=>{const cur=p.currency||'USD';(p.holdings||[]).forEach(h=>{
+    const sh=+h.shares||0,bp=+h.buyPrice||0,px=+h.curPrice||0,cost=sh*bp,val=sh*px;
+    const dp=h.dayChangePct!=null&&h.dayChangePct!==''&&isFinite(+h.dayChangePct)?+h.dayChangePct:null;
+    const dayAbs=dp!=null?val-val/(1+dp/100):null;
+    rows.push({p,h,cur,kind:p.kind||'stock',t:h.ticker||'?',name:h.name||h.ticker||'',broker:p.name,sector:h.sector||'Other',sh,bp,px,cost,val,dp,date:h.date||'',
+      vU:toUSD(val,cur),cU:toUSD(cost,cur),pU:toUSD(val-cost,cur),dU:dayAbs!=null?toUSD(dayAbs,cur):null,ret:cost>0?(val-cost)/cost*100:null});
+  });});
+  const tot=rows.reduce((s,r)=>s+r.vU,0);rows.forEach(r=>r.w=tot>0?r.vU/tot*100:0);
+  return rows;
+}
+function _mktOpen(tz,o,c){
+  try{const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',hour:'numeric',minute:'numeric',hourCycle:'h23'}).formatToParts(new Date()),g=t=>(f.find(x=>x.type===t)||{}).value;
+    const mins=(+g('hour')%24)*60+(+g('minute'));return !/Sat|Sun/.test(g('weekday'))&&mins>=o&&mins<c;}catch(e){return false;}
+}
+function _pfRecord(rows){
+  if(!rows.length||!_authed())return;
+  const d=todayStr(),v=+rows.reduce((s,r)=>s+r.vU,0).toFixed(2),c=+rows.reduce((s,r)=>s+r.cU,0).toFixed(2);
+  const H=state.pfHist||(state.pfHist=[]),last=H[H.length-1];
+  if(last&&last.d===d){last.v=v;last.c=c;}else{H.push({d,v,c});if(H.length>1500)H.splice(0,H.length-1500);saveState();}
+}
+// Binary-split treemap in % coordinates
+function _pfTreemap(items,x,y,w,h,out){
+  if(!items.length)return;
+  if(items.length===1){out.push({...items[0],x,y,w,h});return;}
+  const tot=items.reduce((s,i)=>s+i.s,0);let acc=0,k=0;
+  while(k<items.length-1&&acc+items[k].s<=tot/2){acc+=items[k].s;k++;}
+  k=Math.max(1,k);const A=items.slice(0,k),B=items.slice(k),fa=A.reduce((s,i)=>s+i.s,0)/(tot||1);
+  if(w>=h){_pfTreemap(A,x,y,w*fa,h,out);_pfTreemap(B,x+w*fa,y,w*(1-fa),h,out);}
+  else{_pfTreemap(A,x,y,w,h*fa,out);_pfTreemap(B,x,y+h*fa,w,h*(1-fa),out);}
+}
+function _pfHeatCol(v,scale){
+  if(v==null)return 'rgba(100,116,139,.55)';
+  const t=Math.max(-1,Math.min(1,v/scale)),a=(.35+.55*Math.abs(t)).toFixed(2);
+  return t>=0?`rgba(16,185,129,${a})`:`rgba(244,63,94,${a})`;
+}
+function renderPfScreen(){
+  const el=document.getElementById('pf_screen');if(!el)return;
+  Object.values(_pfCharts).forEach(c=>c.destroy());_pfCharts={};
+  const all=_pfRows();
+  if(!all.length){el.innerHTML='';return;}
+  _pfRecord(all);
+  const tv=all.reduce((s,r)=>s+r.vU,0),tc=all.reduce((s,r)=>s+r.cU,0),tp=tv-tc,day=all.reduce((s,r)=>s+(r.dU||0),0),dayBase=tv-day;
+  const gains=all.reduce((s,r)=>s+Math.max(0,r.pU),0),losses=all.reduce((s,r)=>s+Math.min(0,r.pU),0);
+  const winners=all.filter(r=>r.pU>0.005).length,losers=all.filter(r=>r.pU<-0.005).length;
+  const brokers=[...new Set(all.map(r=>r.broker))];window._pfBrokers=brokers;
+  if(_pfBroker!=='all'&&!brokers.includes(_pfBroker))_pfBroker='all';
+  const priced=state.portfolios.map(p=>p.pricesAt).filter(Boolean).sort().pop();
+  const usOpen=_mktOpen('America/New_York',570,960),inOpen=_mktOpen('Asia/Kolkata',555,930);
+  const tape=all.filter(r=>r.px>0).sort((a,b)=>b.vU-a.vU).map(r=>`<span class="pf-tk" onclick="openHolding('${r.p.id}','${r.h.id}')"><b>${esc(r.t)}</b>${fmt(r.px,r.cur)}<span class="${_pfCls(r.dp)}">${r.dp==null?'·':(r.dp>=0?'▲ ':'▼ ')+Math.abs(r.dp).toFixed(2)+'%'}</span></span>`).join('');
+  // Currency + broker split
+  const byCur={},byBroker={},bySector={};all.forEach(r=>{byCur[r.cur]=(byCur[r.cur]||0)+r.vU;byBroker[r.broker]=(byBroker[r.broker]||0)+r.vU;bySector[r.sector]=(bySector[r.sector]||0)+r.vU;});
+  const PAL=['#8B5CF6','#06B6D4','#F59E0B','#10B981','#EC4899','#3B82F6','#F43F5E','#84CC16','#A855F7','#14B8A6'];
+  const split=(o)=>{const e=Object.entries(o).sort((a,b)=>b[1]-a[1]);return `<div class="pf-bar">${e.map(([k,v],i)=>`<i style="width:${tv>0?v/tv*100:0}%;background:${PAL[i%PAL.length]}" title="${esc(k)} · ${tv>0?(v/tv*100).toFixed(1):0}%"></i>`).join('')}</div><div class="pf-legend">${e.map(([k,v],i)=>`<span style="--c:${PAL[i%PAL.length]}">${esc(k)} <b>${tv>0?(v/tv*100).toFixed(1):0}%</b></span>`).join('')}</div>`;};
+  // Movers
+  const dayM=all.filter(r=>r.dp!=null).sort((a,b)=>b.dp-a.dp),retM=all.filter(r=>r.ret!=null).sort((a,b)=>b.ret-a.ret);
+  const mv=(r,v)=>`<div class="pf-mv" onclick="openHolding('${r.p.id}','${r.h.id}')"><span><b>${esc(r.t)}</b> <small style="color:var(--ink3)">${esc(r.broker)}</small></span><b class="${_pfCls(v)}">${_pfPct(v)}</b></div>`;
+  const movers=(list,k)=>list.length?`${list.slice(0,3).map(r=>mv(r,r[k])).join('')}${list.length>3?`<div class="pf-mini-h" style="margin-top:8px">Laggards</div>${list.slice(-Math.min(3,list.length-3)).reverse().map(r=>mv(r,r[k])).join('')}`:''}`:'<div class="es-sub">No data yet</div>';
+  // Treemap
+  const tiles=[];_pfTreemap(all.filter(r=>r.vU>0).sort((a,b)=>b.vU-a.vU).map(r=>({r,s:r.vU})),0,0,100,100,tiles);
+  const hv=r=>_pfHeat==='day'?r.dp:r.ret,scale=_pfHeat==='day'?3:40;
+  const tm=tiles.map(({r,x,y,w,h})=>`<div class="pf-tile" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%;background:${_pfHeatCol(hv(r),scale)}" title="${esc(r.t)} · ${esc(r.name)} · ${_pfM(r.vU)} · ${_pfPct(hv(r))}" onclick="openHolding('${r.p.id}','${r.h.id}')">${w*h>40?`<b>${esc(r.t)}</b><span>${_pfPct(hv(r))}</span>${w*h>140?`<span>${_pfM(r.vU,0)}</span>`:''}`:''}</div>`).join('');
+  // Table
+  const q=_pfQ.trim().toLowerCase();
+  let rows=all.filter(r=>(_pfBroker==='all'||r.broker===_pfBroker)&&(!q||`${r.t} ${r.name} ${r.broker} ${r.sector}`.toLowerCase().includes(q)));
+  const sk=_pfSort.k;rows.sort((a,b)=>{const x=a[sk],y=b[sk];if(typeof x==='string')return _pfSort.d*String(x).localeCompare(String(y));return _pfSort.d*((x==null?-Infinity:x)-(y==null?-Infinity:y));});
+  const th=(k,l)=>`<th class="${_pfSort.k===k?'on':''}" onclick="pfSort('${k}')">${l}${_pfSort.k===k?(_pfSort.d<0?' ▾':' ▴'):''}</th>`;
+  const fv=rows.reduce((s,r)=>s+r.vU,0),fc=rows.reduce((s,r)=>s+r.cU,0),fd=rows.reduce((s,r)=>s+(r.dU||0),0);
+  const body=rows.map(r=>`<tr onclick="openHolding('${r.p.id}','${r.h.id}')">
+    <td><div class="pf-symc"><span class="pf-sym" style="background:linear-gradient(135deg,hsl(${_pfHue(r.t)} 70% 52%),hsl(${(_pfHue(r.t)+40)%360} 70% 40%))">${esc(r.t.slice(0,6))}</span><div><b>${esc(r.name)}</b><small>${esc(r.broker)} · ${esc(r.sector)}</small></div></div></td>
+    <td>${r.kind==='crypto'?+r.sh.toFixed(6):+r.sh.toFixed(4)}</td><td>${fmt(r.bp,r.cur)}</td><td>${fmt(r.px,r.cur)}</td>
+    <td class="${_pfCls(r.dp)}">${_pfPct(r.dp)}</td><td class="${_pfCls(r.dU)}">${r.dU==null?'—':_pfS(r.dU)}</td>
+    <td>${_pfM(r.cU)}</td><td><b>${_pfM(r.vU)}</b></td>
+    <td class="${_pfCls(r.pU)}">${_pfS(r.pU)}</td><td class="${_pfCls(r.ret)}">${_pfPct(r.ret)}</td>
+    <td>${r.w.toFixed(1)}%<span class="pf-w"><i style="width:${Math.min(100,r.w)}%"></i></span></td></tr>`).join('');
+  el.innerHTML=`<div class="pf">
+    <div class="pf-h"><h3>📟 Portfolio screen<span>all ${_plural(all.length,'holding')} across ${_plural(brokers.length,'account')}</span></h3>
+      <div class="pf-mkts"><span class="pf-pill ${usOpen?'open':''}">🇺🇸 NYSE ${usOpen?'open':'closed'}</span><span class="pf-pill ${inOpen?'open':''}">🇮🇳 NSE ${inOpen?'open':'closed'}</span>
+        ${priced?`<span class="pf-pill open">prices ${_ago(priced)}</span>`:''}
+        <span class="pf-seg">${['USD','INR'].map(c=>`<button class="${_pfCur===c?'on':''}" onclick="_pfCur='${c}';renderPfScreen()">${c}</button>`).join('')}</span>
+        <button class="btn btn-outline btn-sm" onclick="refreshAllPrices(true)">⚡ Refresh</button></div></div>
+    ${tape?`<div class="pf-tape"><div class="pf-tape-in">${tape}${tape}</div></div>`:''}
+    <div class="pf-hero">
+      <div class="pf-card">
+        <div class="pf-mini-h">Total value</div>
+        <div class="pf-val">${_pfM(tv)}</div>
+        <div class="pf-chg"><span class="${_pfCls(day)}">${_pfS(day)} (${dayBase>0?_pfPct(day/dayBase*100):'—'}) today</span><span class="${_pfCls(tp)}">${_pfS(tp)} (${tc>0?_pfPct(tp/tc*100):'—'}) all time</span></div>
+        <div class="pf-kpis">
+          <div class="pf-kpi"><i>Invested</i><b>${_pfM(tc)}</b><small>cost basis</small></div>
+          <div class="pf-kpi"><i>Unrealised P&amp;L</i><b class="${_pfCls(tp)}">${_pfS(tp)}</b><small>${tc>0?_pfPct(tp/tc*100):''} return</small></div>
+          <div class="pf-kpi"><i>Gains / losses</i><b><span class="pf-up">${_pfS(gains,0)}</span> <span class="pf-dn">${_pfS(losses,0)}</span></b><small>${winners} up · ${losers} down</small></div>
+          <div class="pf-kpi"><i>Largest position</i><b>${esc((all.slice().sort((a,b)=>b.vU-a.vU)[0]||{}).t||'—')}</b><small>${(Math.max(...all.map(r=>r.w))).toFixed(1)}% of portfolio</small></div>
+        </div>
+      </div>
+      <div class="pf-card">
+        <div class="pf-card-h"><b>Allocation</b><span>by value</span></div>
+        <div class="pf-mini-h">By account</div>${split(byBroker)}
+        <div class="pf-mini-h" style="margin-top:12px">By currency</div>${split(byCur)}
+        <div class="pf-mini-h" style="margin-top:12px">By sector</div>${split(bySector)}
+      </div>
+    </div>
+    <div class="pf-card">
+      <div class="pf-card-h"><b>💹 Cumulative invested vs P&amp;L</b><span>invested = cost basis of current holdings by purchase date · value tracked daily from today</span></div>
+      <div class="ch-wrap h240"><canvas id="pf_cum"></canvas></div>
+    </div>
+    <div class="pf-grid2">
+      <div class="pf-card">
+        <div class="pf-card-h"><b>🧱 Invested vs P&amp;L by holding</b><span>purple = invested still held · green = gain · red = lost</span></div>
+        <div class="ch-wrap" style="height:${Math.max(200,all.length*24+50)}px"><canvas id="pf_bars"></canvas></div>
+      </div>
+      <div class="pf-card">
+        <div class="pf-card-h"><b>🗺 Heatmap</b><span class="pf-seg">${[['day','Today'],['total','All-time']].map(([k,l])=>`<button class="${_pfHeat===k?'on':''}" onclick="_pfHeat='${k}';renderPfScreen()">${l}</button>`).join('')}</span></div>
+        <div class="pf-tm">${tm}</div>
+        <div class="pf-movers" style="margin-top:12px">
+          <div><div class="pf-mini-h">Today's movers</div>${movers(dayM,'dp')}</div>
+          <div><div class="pf-mini-h">All-time leaders</div>${movers(retM,'ret')}</div>
+        </div>
+      </div>
+    </div>
+    <div class="pf-card">
+      <div class="pf-tools">
+        <div class="hist-search"><span>⌕</span><input type="search" value="${esc(_pfQ)}" placeholder="Search ticker, name, account, sector…" oninput="_pfQ=this.value;pfTable()" id="pf_q" autocomplete="off"></div>
+        <div class="filter-group">${['all',...brokers].map((b,i)=>`<button class="filter-chip ${_pfBroker===b?'active':''}" onclick="_pfBroker=${i?`_pfBrokers[${i-1}]`:"'all'"};renderPfScreen()">${b==='all'?'All accounts':esc(b)}<span class="filter-count">${b==='all'?all.length:all.filter(r=>r.broker===b).length}</span></button>`).join('')}</div>
+      </div>
+      <div class="pf-tbl-wrap"><table class="pf-tbl"><thead><tr>${th('t','Holding')}${th('sh','Qty')}${th('bp','Avg cost')}${th('px','Price')}${th('dp','Day %')}${th('dU','Day P&amp;L')}${th('cU','Invested')}${th('vU','Value')}${th('pU','P&amp;L')}${th('ret','Return')}${th('w','Weight')}</tr></thead>
+        <tbody>${body||'<tr><td colspan="11" style="text-align:center;color:var(--ink3)">No holdings match.</td></tr>'}</tbody>
+        <tfoot><tr><td>${_plural(rows.length,'holding')}</td><td></td><td></td><td></td><td></td><td class="${_pfCls(fd)}">${_pfS(fd)}</td><td>${_pfM(fc)}</td><td>${_pfM(fv)}</td><td class="${_pfCls(fv-fc)}">${_pfS(fv-fc)}</td><td class="${_pfCls(fv-fc)}">${fc>0?_pfPct((fv-fc)/fc*100):'—'}</td><td>${tv>0?(fv/tv*100).toFixed(1):0}%</td></tr></tfoot></table></div>
+    </div>
+  </div>`;
+  setTimeout(()=>_pfDrawCharts(all,tv,tc),40);
+}
+function pfSort(k){_pfSort=_pfSort.k===k?{k,d:-_pfSort.d}:{k,d:k==='t'?1:-1};renderPfScreen();}
+function pfTable(){const pos=document.getElementById('pf_q')?.selectionStart;renderPfScreen();const i=document.getElementById('pf_q');if(i){i.focus();try{i.setSelectionRange(pos,pos);}catch(e){}}}
+function _pfDrawCharts(all,tv,tc){
+  if(typeof Chart==='undefined')return;
+  const fx=_pfFx(_pfCur),money=v=>_pfM(v/fx,0);
+  // Cumulative invested (step) vs tracked value and P&L
+  const dated=all.filter(r=>r.date).sort((a,b)=>a.date.localeCompare(b.date)),undated=all.filter(r=>!r.date).reduce((s,r)=>s+r.cU,0);
+  const inv={};let cum=undated;dated.forEach(r=>{cum+=r.cU;inv[r.date]=cum;});
+  const today=todayStr(),hist={};(state.pfHist||[]).forEach(x=>{hist[x.d]=x;});hist[today]={d:today,v:tv,c:tc};
+  const labels=[...new Set([...Object.keys(inv),...Object.keys(hist)])].sort();
+  if(undated&&labels.length&&!inv[labels[0]])inv[labels[0]]=undated+(inv[labels[0]]||0);
+  let run=undated;const invS=labels.map(d=>{if(inv[d]!=null)run=inv[d];return +(run*fx).toFixed(2);});
+  const valS=labels.map(d=>hist[d]?+(hist[d].v*fx).toFixed(2):null),pnlS=labels.map((d,i)=>hist[d]?+((hist[d].v-hist[d].c)*fx).toFixed(2):null);
+  const lbl=d=>new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});
+  const c1=document.getElementById('pf_cum');
+  if(c1)_pfCharts.cum=new Chart(c1,{data:{labels:labels.map(lbl),datasets:[
+    {type:'line',label:'Invested (cumulative)',data:invS,stepped:true,borderColor:'#8B5CF6',backgroundColor:'#8B5CF622',fill:true,pointRadius:2,borderWidth:2,order:1},
+    {type:'line',label:'Market value',data:valS,borderColor:'#06B6D4',backgroundColor:'#06B6D4',pointRadius:4,pointHoverRadius:6,borderWidth:2,spanGaps:true,order:0},
+    {type:'bar',label:'P&L',data:pnlS,backgroundColor:pnlS.map(v=>v==null?'transparent':v>=0?'#10B981CC':'#F43F5ECC'),borderRadius:4,order:2}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{boxWidth:8,font:{size:10}}},tooltip:{callbacks:{label:c=>c.raw==null?null:` ${c.dataset.label}: ${money(c.raw)}`}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:10}},y:{ticks:{font:{size:9},callback:v=>money(v)}}}}});
+  // Per-holding: invested kept / gain / lost
+  const rs=all.slice().sort((a,b)=>Math.max(b.cU,b.vU)-Math.max(a.cU,a.vU));
+  const c2=document.getElementById('pf_bars');
+  if(c2)_pfCharts.bars=new Chart(c2,{type:'bar',data:{labels:rs.map(r=>r.t),datasets:[
+    {label:'Invested (held)',data:rs.map(r=>+(Math.min(r.cU,r.vU)*fx).toFixed(2)),backgroundColor:'#8B5CF6CC',borderRadius:3,stack:'s'},
+    {label:'Gain',data:rs.map(r=>+(Math.max(0,r.pU)*fx).toFixed(2)),backgroundColor:'#10B981CC',borderRadius:3,stack:'s'},
+    {label:'Lost',data:rs.map(r=>+(Math.max(0,-r.pU)*fx).toFixed(2)),backgroundColor:'#F43F5ECC',borderRadius:3,stack:'s'}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{boxWidth:8,font:{size:10}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${money(c.raw)}`,footer:it=>{const r=rs[it[0].dataIndex];return `Invested ${_pfM(r.cU)} → Value ${_pfM(r.vU)} (${_pfPct(r.ret)})`;}}}},
+      scales:{x:{stacked:true,ticks:{font:{size:9},callback:v=>money(v)}},y:{stacked:true,grid:{display:false},ticks:{font:{family:"'JetBrains Mono',monospace",size:10}}}}}});
+}
+/* Holding detail sheet (with Finnhub profile / day range / 52-week range for US tickers) */
+const _fhInfo={};
+async function _fhDetail(t){
+  const k=(state.settings||{}).finnhub;if(!k)return null;
+  if(_fhInfo[t]&&Date.now()-_fhInfo[t].at<120e3)return _fhInfo[t];
+  const s=encodeURIComponent(t),g=u=>fetch(`https://finnhub.io/api/v1/${u}&token=${encodeURIComponent(k)}`).then(r=>r.ok?r.json():null).catch(()=>null);
+  const [q,pr,mt]=await Promise.all([g(`quote?symbol=${s}`),g(`stock/profile2?symbol=${s}`),g(`stock/metric?symbol=${s}&metric=all`)]);
+  return _fhInfo[t]={q,pr:pr||{},m:(mt&&mt.metric)||{},at:Date.now()};
+}
+function _pfRange(lo,hi,cur,label,c){
+  if(!(hi>lo))return '';
+  const p=Math.max(0,Math.min(100,(cur-lo)/(hi-lo)*100));
+  return `<div class="pf-mini-h" style="margin-top:12px">${label}</div><div class="pf-range"><i style="left:${p}%"></i></div><div class="pf-range-l"><span>${fmt(lo,c)}</span><span>${fmt(hi,c)}</span></div>`;
+}
+async function openHolding(pid,hid){
+  const r=_pfRows().find(x=>x.p.id===pid&&x.h.id===hid);if(!r)return;
+  const held=r.date?Math.max(0,Math.round((Date.now()-new Date(r.date+'T00:00:00'))/864e5)):null;
+  const kp=(l,v,s,c='')=>`<div class="pf-kpi"><i>${l}</i><b class="${c}">${v}</b>${s?`<small>${s}</small>`:''}</div>`;
+  const render=(info)=>{
+    const q=info&&info.q,pr=(info&&info.pr)||{},m=(info&&info.m)||{};
+    const logo=typeof pr.logo==='string'&&/^https:\/\/static\d*\.finnhub\.io\//.test(pr.logo)?pr.logo:'';
+    const web=typeof pr.weburl==='string'&&/^https?:\/\//.test(pr.weburl)?pr.weburl:'';
+    const px=q&&q.c>0?q.c:r.px,dp=q&&q.c>0&&isFinite(q.dp)?q.dp:r.dp;
+    document.getElementById('hd_title').textContent=`${r.t} · ${r.broker}`;
+    document.getElementById('hd_body').innerHTML=`
+      <div class="pf-dh">${logo?`<img src="${esc(logo)}" alt="" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:`<span class="pf-sym" style="width:44px;height:44px;background:linear-gradient(135deg,hsl(${_pfHue(r.t)} 70% 52%),hsl(${(_pfHue(r.t)+40)%360} 70% 40%))">${esc(r.t.slice(0,6))}</span>`}
+        <div><div style="font-weight:700;color:var(--ink)">${esc(pr.name||r.name)}</div><div style="font-size:11px;color:var(--ink3)">${esc([pr.exchange,pr.finnhubIndustry||r.sector,pr.country].filter(Boolean).join(' · '))}</div></div></div>
+      <div class="pf-dpx">${fmt(px,r.cur)}</div>
+      <div class="pf-chg"><span class="${_pfCls(dp)}">${_pfPct(dp)} today</span>${q&&q.pc?`<span style="color:var(--ink3)">prev close ${fmt(q.pc,r.cur)} · open ${fmt(q.o,r.cur)}</span>`:''}</div>
+      ${q&&q.h>q.l?_pfRange(q.l,q.h,px,'Day range',r.cur):''}
+      ${m['52WeekHigh']>m['52WeekLow']?_pfRange(m['52WeekLow'],m['52WeekHigh'],px,'52-week range',r.cur):''}
+      <div class="pf-mini-h" style="margin-top:16px">Your position</div>
+      <div class="pf-dgrid">
+        ${kp('Quantity',String(+r.sh.toFixed(6)),r.kind==='crypto'?'coins':'shares')}
+        ${kp('Avg cost',fmt(r.bp,r.cur),'')}
+        ${kp('Invested',fmt(r.cost,r.cur),r.cur!=='USD'?'≈ '+fmtUSD(r.cU):'')}
+        ${kp('Value',fmt(r.sh*px,r.cur),r.cur!=='USD'?'≈ '+fmtUSD(toUSD(r.sh*px,r.cur)):'')}
+        ${kp('P&amp;L',(r.sh*px-r.cost>=0?'+':'−')+fmt(Math.abs(r.sh*px-r.cost),r.cur),r.cost>0?_pfPct((r.sh*px-r.cost)/r.cost*100):'',_pfCls(r.sh*px-r.cost))}
+        ${kp('Weight',r.w.toFixed(1)+'%','of all holdings')}
+        ${kp('Bought',r.date?fmtDate(r.date):'—',held!=null?_plural(held,'day')+' held':'')}
+        ${pr.marketCapitalization?kp('Market cap',(v=>v>=1e12?'$'+(v/1e12).toFixed(2)+'T':v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+(v/1e6).toFixed(0)+'M')(pr.marketCapitalization*1e6),''):''}
+        ${m.peTTM||m.peBasicExclExtraTTM?kp('P/E (TTM)',(+(m.peTTM||m.peBasicExclExtraTTM)).toFixed(1),m.beta?'beta '+(+m.beta).toFixed(2):''):''}
+      </div>
+      <div class="pf-bar" title="Invested vs value"><i style="width:${Math.min(100,r.cost>0?Math.min(r.cost,r.sh*px)/Math.max(r.cost,r.sh*px)*100:0)}%;background:#8B5CF6"></i><i style="width:${r.cost>0?Math.abs(r.sh*px-r.cost)/Math.max(r.cost,r.sh*px)*100:0}%;background:${r.sh*px>=r.cost?'#10B981':'#F43F5E'}"></i></div>
+      <div class="pf-legend"><span style="--c:#8B5CF6">invested</span><span style="--c:${r.sh*px>=r.cost?'#10B981':'#F43F5E'}">${r.sh*px>=r.cost?'gain':'lost'}</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+        <button class="btn btn-outline btn-sm" onclick="closeModal('m_hold');jumpTo('port','pc_${r.p.id}')">Open in ${esc(r.broker)} →</button>
+        ${web?`<a class="btn btn-ghost btn-sm" href="${esc(web)}" target="_blank" rel="noopener noreferrer">Company site ↗</a>`:''}
+        ${r.cur==='USD'&&r.kind!=='crypto'&&!(state.settings||{}).finnhub?'<button class="btn btn-ghost btn-sm" onclick="closeModal(\'m_hold\');openMktKeys()">🔑 Add Finnhub key for live detail</button>':''}
+      </div>
+      ${info===undefined?'<div class="mkt-note" style="margin-top:10px">Loading live detail…</div>':''}`;
+  };
+  const live=r.cur==='USD'&&r.kind!=='crypto'&&r.h.sector!=='Bonds'&&!!(state.settings||{}).finnhub;
+  render(live?undefined:null);openModal('m_hold');
+  if(live){const info=await _fhDetail(r.t);if(document.getElementById('m_hold').style.display==='flex')render(info);}
+}
+const _renderPortfoliosBase=renderPortfolios;
+window.renderPortfolios=function(){_renderPortfoliosBase();renderPfScreen();};
+
+/* ═══ Section insights (Expenses · Income · Loans) ═══ */
+function _secIns(sec,list){
+  const anchor=document.getElementById(sec==='loan'?'loan_lifetime':sec+'_summary')||document.getElementById(sec+'_summary');if(!anchor)return;
+  let el=document.getElementById(sec+'_ins');if(!el){el=document.createElement('div');el.id=sec+'_ins';el.className='sec-ins';}
+  if(el.previousElementSibling!==anchor)anchor.after(el);
+  el.innerHTML=list.length?`<div class="sec-ins-h">💡 Insights<span>calculated from your own entries · USD equivalent</span></div><div class="ins-grid">${list.map((x,i)=>`<div class="ins-card ${x.tone}" style="animation-delay:${i*.04}s"><div class="ins-ic">${x.i}</div><div class="ins-body"><div class="ins-t">${esc(x.t)}</div><div class="ins-d">${x.d}</div></div></div>`).join('')}</div>`:'';
+}
+const _pctChg=(a,b)=>b>0?((a-b)/b*100):null;
+const _chgTxt=(a,b)=>{const p=_pctChg(a,b);return p==null?'':` (${p>=0?'+':''}${p.toFixed(0)}%)`;};
+function _flat(list,cb){const o=[];list.forEach(t=>(t.entries||[]).forEach(e=>{if(/^\d{4}-\d{2}-\d{2}$/.test(e.date||''))o.push(cb(t,e));}));return o;}
+function expInsights(){
+  const E=_flat(state.expenses,(t,e)=>({d:e.date,u:toUSD(+e.amount||0,t.currency||'USD'),tr:t.name,cat:e.category||'Other',desc:e.desc||t.name}));
+  if(!E.length)return[];
+  const now=new Date(),ym=_monthKey(now),day=now.getDate(),lm=_monthKey(new Date(now.getFullYear(),now.getMonth()-1,1));
+  const sum=f=>E.filter(f).reduce((s,e)=>s+e.u,0),out=[];
+  const thisM=sum(e=>e.d.startsWith(ym)),lastTD=sum(e=>e.d.startsWith(lm)&&+e.d.slice(8)<=day),lastFull=sum(e=>e.d.startsWith(lm));
+  out.push({i:'📆',tone:lastTD>0&&thisM>lastTD*1.1?'warn':'good',t:`${fmtUSD(thisM,0)} spent this month so far`,d:`vs ${fmtUSD(lastTD,0)} by day ${day} last month${_chgTxt(thisM,lastTD)} · last month in total ${fmtUSD(lastFull,0)}.`});
+  const six=_lastMonths(7).slice(0,6),avg6=six.reduce((s,k)=>s+sum(e=>e.d.startsWith(k)),0)/6;
+  if(avg6>0)out.push({i:'📊',tone:lastFull>avg6*1.15?'warn':'info',t:`Last month vs 6-month average`,d:`${fmtUSD(lastFull,0)} vs a typical ${fmtUSD(avg6,0)}${_chgTxt(lastFull,avg6)}.`});
+  const d90=_iso(new Date(Date.now()-90*864e5)),r90=E.filter(e=>e.d>=d90),t90=r90.reduce((s,e)=>s+e.u,0);
+  const byT={};r90.forEach(e=>{byT[e.tr]=(byT[e.tr]||0)+e.u;});const topT=Object.entries(byT).sort((a,b)=>b[1]-a[1]);
+  if(topT[0])out.push({i:'🏷',tone:'info',t:`Biggest bucket: ${topT[0][0]}`,d:`${fmtUSD(topT[0][1],0)} in 90 days · ${(topT[0][1]/t90*100).toFixed(0)}% of spending${topT[1]?`, then ${esc(topT[1][0])} (${(topT[1][1]/t90*100).toFixed(0)}%)`:''}.`});
+  const isCas=s=>/casino|gambl|\bbet/i.test(s);
+  const casOut=r90.filter(e=>isCas(e.tr)).reduce((s,e)=>s+e.u,0);
+  const casIn=_flat(state.incomes.filter(s=>isCas(s.name)),(s,e)=>({d:e.date,u:toUSD(+e.amount||0,s.currency||'USD')})).filter(e=>e.d>=d90).reduce((s,e)=>s+e.u,0);
+  if(casOut>0)out.push({i:'🎰',tone:casIn-casOut<0?'bad':'warn',t:`Casino net ${casIn-casOut>=0?'+':'−'}${fmtUSD(Math.abs(casIn-casOut),0)} in 90 days`,d:`${fmtUSD(casOut,0)} deposited vs ${fmtUSD(casIn,0)} withdrawn${casIn-casOut<0?' — this is money that could go to card balances charging 25–30%.':'.'}`});
+  const d30=_iso(new Date(Date.now()-30*864e5)),r30=E.filter(e=>e.d>=d30),big=r30.slice().sort((a,b)=>b.u-a.u)[0];
+  if(r30.length)out.push({i:'💸',tone:'info',t:`${fmtUSD(r30.reduce((s,e)=>s+e.u,0)/30,0)} per day on average`,d:`Last 30 days, ${_plural(r30.length,'expense')}${big?` · largest ${fmtUSD(big.u,0)} (${esc(big.desc)}, ${fmtDate(big.d)})`:''}.`});
+  const debtP=r90.filter(e=>/card|loan|payment/i.test(e.tr)).reduce((s,e)=>s+e.u,0);
+  if(debtP>0&&t90>0)out.push({i:'💳',tone:'info',t:`${(debtP/t90*100).toFixed(0)}% of outflows are debt payments`,d:`${fmtUSD(debtP,0)} to cards and loans in the last 90 days.`});
+  return out;
+}
+function incInsights(){
+  const I=_flat(state.incomes,(s,e)=>({d:e.date,u:toUSD(+e.amount||0,s.currency||'USD'),a:+e.amount||0,src:s.name,s,cur:s.currency||'USD'}));
+  if(!I.length)return[];
+  const sum=f=>I.filter(f).reduce((s,e)=>s+e.u,0),out=[],m7=_lastMonths(7),last3=m7.slice(3,6),prev3=m7.slice(0,3);
+  const a3=last3.reduce((s,k)=>s+sum(e=>e.d.startsWith(k)),0)/3,p3=prev3.reduce((s,k)=>s+sum(e=>e.d.startsWith(k)),0)/3;
+  out.push({i:'📈',tone:a3>=p3?'good':'warn',t:`${fmtUSD(a3,0)} / month lately`,d:`Average of the last 3 full months vs ${fmtUSD(p3,0)} the 3 before${_chgTxt(a3,p3)}.`});
+  const yr=String(new Date().getFullYear());out.push({i:'🗓',tone:'info',t:`${fmtUSD(sum(e=>e.d.startsWith(yr)),0)} received in ${yr}`,d:`${_plural(I.filter(e=>e.d.startsWith(yr)).length,'entry')} year to date.`.replace('entrys','entries')});
+  const sal=state.incomes.filter(s=>s.category==='Salary'&&(s.entries||[]).length>=3).sort((a,b)=>b.entries.length-a.entries.length)[0];
+  if(sal){
+    const ds=sal.entries.map(e=>e.date).filter(Boolean).sort(),gaps=[];for(let i=Math.max(1,ds.length-7);i<ds.length;i++)gaps.push((new Date(ds[i])-new Date(ds[i-1]))/864e5);
+    gaps.sort((a,b)=>a-b);const gap=Math.round(gaps[Math.floor(gaps.length/2)]||14);
+    let next=new Date(ds[ds.length-1]+'T00:00:00');const today=new Date();today.setHours(0,0,0,0);while(next<=today)next.setDate(next.getDate()+gap);
+    const amts=sal.entries.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3).map(e=>+e.amount||0).sort((a,b)=>a-b);
+    out.push({i:'💼',tone:'good',t:`Next ${sal.name} pay ≈ ${fmtDate(_iso(next))}`,d:`Paid every ~${gap} days · typical amount ${fmt(amts[1]??amts[0],sal.currency||'USD')}.`});
+  }
+  const d365=_iso(new Date(Date.now()-365*864e5)),r12=I.filter(e=>e.d>=d365),t12=r12.reduce((s,e)=>s+e.u,0),byS={};r12.forEach(e=>{byS[e.src]=(byS[e.src]||0)+e.u;});
+  const top=Object.entries(byS).sort((a,b)=>b[1]-a[1])[0];
+  if(top&&t12>0)out.push({i:'🎯',tone:top[1]/t12>0.7?'warn':'info',t:`${(top[1]/t12*100).toFixed(0)}% from ${top[0]}`,d:`${fmtUSD(top[1],0)} of ${fmtUSD(t12,0)} received in the last 12 months.`});
+  const E3=last3.reduce((s,k)=>s+_flat(state.expenses,(t,e)=>({d:e.date,u:toUSD(+e.amount||0,t.currency||'USD')})).filter(e=>e.d.startsWith(k)).reduce((a,e)=>a+e.u,0),0)/3;
+  if(a3>0)out.push({i:'🐖',tone:a3-E3>=0?'good':'bad',t:`Savings rate ${((a3-E3)/a3*100).toFixed(0)}%`,d:`Last 3 months: ${fmtUSD(a3,0)} in vs ${fmtUSD(E3,0)} out per month (${a3-E3>=0?'+':'−'}${fmtUSD(Math.abs(a3-E3),0)}).`});
+  return out;
+}
+function loanInsights(){
+  const act=state.loans.filter(l=>!l.archived).map(l=>({l,m:calcLoanMetrics(l),cur:l.currency||'USD'})).filter(x=>x.m.curBal>0.5);
+  if(!act.length)return[];
+  const out=[],debt=act.reduce((s,x)=>s+toUSD(x.m.curBal,x.cur),0);
+  const burn=act.reduce((s,x)=>s+toUSD(x.m.curBal*(+x.l.rate||0)/1200,x.cur),0);
+  out.push({i:'🔥',tone:burn>200?'bad':'warn',t:`${fmtUSD(burn,0)} / month in interest`,d:`What your current balances cost each month at their stated rates (${fmtUSD(burn*12,0)} a year).`});
+  const hi=act.filter(x=>(+x.l.rate||0)>0).sort((a,b)=>b.l.rate-a.l.rate)[0];
+  if(hi)out.push({i:'🎯',tone:'warn',t:`Pay first: ${hi.l.name}`,d:`Highest rate at ${(+hi.l.rate).toFixed(2)}% on ${fmt(hi.m.curBal,hi.cur,0)} — every extra dollar here saves the most interest.`});
+  const flag=act.filter(x=>/past due|blocked|bounced|over (the|limit)|overdue/i.test(x.l.notes||''));
+  if(flag.length)out.push({i:'🚨',tone:'bad',t:`${_plural(flag.length,'account')} need attention`,d:flag.map(x=>esc(x.l.name)).join(', ')+' — notes mention past-due, blocked or bounced payments.'});
+  const gold=act.filter(x=>x.m.method==='gold'&&x.m.maturity).sort((a,b)=>a.m.maturity.localeCompare(b.m.maturity))[0];
+  if(gold){const dl=Math.round((new Date(gold.m.maturity+'T00:00:00')-new Date())/864e5);out.push({i:'🪙',tone:dl<90?'bad':'info',t:`${gold.l.name} due in ${dl} days`,d:`Bullet repayment of about ${fmt(gold.m.dueAtMaturity,gold.cur,0)} on ${fmtDate(gold.m.maturity)}.`});}
+  const free=act.filter(x=>!(+x.l.rate));if(free.length)out.push({i:'🤝',tone:'good',t:`${_plural(free.length,'interest-free loan')}`,d:free.map(x=>`${esc(x.l.name)} ${fmt(x.m.curBal,x.cur,0)}`).join(' · ')});
+  const inc12=_flat(state.incomes,(s,e)=>({d:e.date,u:toUSD(+e.amount||0,s.currency||'USD')})).filter(e=>e.d>=_iso(new Date(Date.now()-365*864e5))).reduce((s,e)=>s+e.u,0);
+  if(inc12>0)out.push({i:'⚖️',tone:debt/inc12>0.5?'bad':'info',t:`Debt = ${(debt/inc12*100).toFixed(0)}% of yearly income`,d:`${fmtUSD(debt,0)} owed vs ${fmtUSD(inc12,0)} received in the last 12 months.`});
+  return out;
+}
+const _renderExpensesIns=renderExpenses;window.renderExpenses=function(){_renderExpensesIns();_secIns('exp',expInsights());};
+const _renderIncomesIns=renderIncomes;window.renderIncomes=function(){_renderIncomesIns();_secIns('inc',incInsights());};
+const _renderLoansIns=window.renderLoans;window.renderLoans=function(){_renderLoansIns();_secIns('loan',loanInsights());};
 
 /* ── Static selects for the new modals ── */
 (()=>{
