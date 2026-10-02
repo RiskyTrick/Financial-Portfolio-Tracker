@@ -2432,7 +2432,7 @@ function renderLoanSummary(){
         <div class="ls-cur-item"><div class="ls-lbl">Balance</div><div class="ls-val a" style="font-size:14px">${f(block.balance)}</div></div>
         <div class="ls-cur-item"><div class="ls-lbl">Paid</div><div class="ls-val g" style="font-size:14px">${f(block.paid)}</div></div>
         <div class="ls-cur-item"><div class="ls-lbl">Int. Paid</div><div class="ls-val r" style="font-size:14px">${f(block.intPaid)}</div></div>
-        <div class="ls-cur-item"><div class="ls-lbl">Monthly EMI</div><div class="ls-val" style="font-size:14px">${f(block.emi)}</div></div>
+        <div class="ls-cur-item"><div class="ls-lbl">Monthly Due</div><div class="ls-val" style="font-size:14px">${f(block.emi)}</div></div>
         <div class="ls-cur-item"><div class="ls-lbl">Avg Rate</div><div class="ls-val a" style="font-size:14px">${block.avgRate.toFixed(2)}%</div></div>
       </div>
     </div>`;
@@ -2481,7 +2481,7 @@ function renderLoanSummary(){
       <div class="ls-item"><div class="ls-lbl">Total Paid</div><div class="ls-val g">${fmtUSD(totalPaid)}</div><div class="ls-sub">all payments</div></div>
       <div class="ls-item"><div class="ls-lbl">Interest Paid</div><div class="ls-val r">${fmtUSD(totalIntPaid)}</div><div class="ls-sub">of ${fmtUSD(totalIntTotal)} total</div></div>
       <div class="ls-item"><div class="ls-lbl">Interest Remaining</div><div class="ls-val a">${fmtUSD(totalIntRemaining)}</div><div class="ls-sub">on schedule</div></div>
-      <div class="ls-item"><div class="ls-lbl">Monthly EMI</div><div class="ls-val">${fmtUSD(totalMonthlyEMI)}</div><div class="ls-sub">combined</div></div>
+      <div class="ls-item"><div class="ls-lbl">Monthly Due</div><div class="ls-val">${fmtUSD(totalMonthlyEMI)}</div><div class="ls-sub">EMIs + interest on bullet loans</div></div>
       <div class="ls-item"><div class="ls-lbl">Total Loan Cost</div><div class="ls-val r">${fmtUSD(totalCostAll)}</div><div class="ls-sub">principal + all interest</div></div>
       <div class="ls-item"><div class="ls-lbl">Avg Interest Rate</div><div class="ls-val a">${avgRate.toFixed(2)}%</div><div class="ls-sub">weighted by principal</div></div>
     </div>
