@@ -1,0 +1,12 @@
+# Personal financial documents and exports — never commit
+data-backup/
+Accounts/
+Gold loan imgs/
+*.pdf
+*.jpg
+*.jpeg
+*.csv
+portfolio_backup_*.txt
+history_*.csv
+.env
+.env.*
