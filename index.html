@@ -5877,7 +5877,7 @@ async function refreshStockPrices(pid,btn,silent){
   let n=0,err=null;const miss=[];
   try{
     for(const h of p.holdings){
-      const t=String(h.ticker||'').toUpperCase();if(!t)continue;
+      const t=String(h.ticker||'').toUpperCase();if(!t||h.sector==='Bonds')continue;
       let q=null;
       if(useFh)q=await _fhQuote(t,k.finnhub);
       else{
