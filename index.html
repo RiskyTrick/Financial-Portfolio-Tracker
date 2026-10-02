@@ -5151,7 +5151,10 @@ function calcGoldMetrics(loan){
   const pays=[...(loan.payments||[])].filter(p=>/^\d{4}-\d{2}-\d{2}$/.test(p.date||'')).sort((a,b)=>a.date.localeCompare(b.date));
   const start=parseLoanStartDate(loan.startDate)||(pays[0]?new Date(pays[0].date+'T00:00:00'):new Date());start.setHours(0,0,0,0);
   const today=new Date();today.setHours(0,0,0,0);const todayIso=_iso(today);
-  const lastPay=pays.length?pays[pays.length-1].date:'';const endIso=lastPay>todayIso?lastPay:todayIso;
+  const lastPay=pays.length?pays[pays.length-1].date:'';
+  // Closed loans stop accruing on their last payment / closure date
+  const closeIso=loan.archived?(lastPay||_dt(loan.closedAt)||todayIso):'';
+  const endIso=closeIso||(lastPay>todayIso?lastPay:todayIso);
   let bal=P,accr=0,intDue=0,totalPaid=0,totalIntPaid=0,totalPrinPaid=0,posted=0,k=1,next=_postDateIso(start,1),periodStart=_iso(start),pi=0;
   const postings=[],enriched=[],timeline=[{label:fmtDate(_iso(start)),date:_iso(start),bal:P}];
   for(const d=new Date(start);;d.setDate(d.getDate()+1)){
@@ -5163,16 +5166,25 @@ function calcGoldMetrics(loan){
       accr=0;periodStart=di;k++;next=_postDateIso(start,k);
     }
     while(pi<pays.length&&pays[pi].date<=di){
-      const p=pays[pi++],amt=parseFloat(p.amount)||0,applied=Math.min(amt,bal);
+      const p=pays[pi++],amt=parseFloat(p.amount)||0;
+      // A payoff collects interest accrued since the last posting before clearing the balance (bank closure rule)
+      if(accr>0&&amt>=bal+accr-1){
+        const i=Math.round(accr),prev=new Date(d);prev.setDate(prev.getDate()-1);
+        bal+=i;intDue+=i;posted+=i;
+        postings.push({date:di,from:periodStart,to:_iso(prev),amount:i,balAfter:bal,closure:true});
+        accr=0;periodStart=di;
+      }
+      const applied=Math.min(amt,bal);
       bal-=applied;const ip=Math.min(applied,intDue);intDue-=ip;
       totalPaid+=amt;totalIntPaid+=ip;totalPrinPaid+=applied-ip;
       enriched.push({...p,intPart:ip,prinPart:applied-ip,balAfter:bal});timeline.push({label:fmtDate(di),date:di,bal});
     }
     if(bal>0)accr+=bal*dr;
   }
+  if(closeIso)accr=0;
   // Project interest postings from tomorrow to maturity assuming no further payments
   const matIso=_postDateIso(start,months),projection=[];let pb=bal,pa=accr,projInt=0;
-  if(bal>0&&todayIso<matIso){
+  if(bal>0&&!closeIso&&todayIso<matIso){
     let pk=k,pn=next;
     for(const d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+1);;d.setDate(d.getDate()+1)){
       const di=_iso(d);if(di>matIso)break;
@@ -5186,8 +5198,8 @@ function calcGoldMetrics(loan){
   return{method:'gold',P,rate,months,emi:bal*rate/1200,totalRepay:P+posted+projInt,totalInt:posted+projInt,totalPaid,totalIntPaid,totalPrinPaid,curBal:bal,
     intOnRem:projInt,pct:P>0?Math.min(100,totalPrinPaid/P*100):0,monthlyIntNow:bal*rate/1200,annualIntNow:bal*rate/100,enriched,
     remMonths:Math.max(0,_monthsBetween(todayIso,matIso)||0),payoffDate:matD.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
-    accruedSinceLast:accr,loanStart:start,postings,projection,timeline,maturity:matIso,dueAtMaturity:bal>0?(todayIso<matIso?pb:bal+accr):0,
-    nextPostDate:next,nextPostEst:Math.round(accr+bal*dr*daysToNext),lastPostDate:postings.length?postings[postings.length-1].date:_iso(start),interestPosted:posted};
+    accruedSinceLast:accr,loanStart:start,postings,projection,timeline,maturity:matIso,dueAtMaturity:closeIso?bal:bal>0?(todayIso<matIso?pb:bal+accr):0,
+    nextPostDate:next,nextPostEst:closeIso?0:Math.round(accr+bal*dr*daysToNext),lastPostDate:postings.length?postings[postings.length-1].date:_iso(start),interestPosted:posted};
 }
 function goldPaySim(m,rate,pay){
   const r=rate/1200,n=Math.max(1,m.remMonths||1);let b=m.curBal+m.accruedSinceLast,intSum=0,months=null;
