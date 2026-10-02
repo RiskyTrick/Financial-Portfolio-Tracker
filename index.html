@@ -2194,7 +2194,7 @@ function fmt(n,cur,d=2){
   } else {
     v=a.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
   }
-  return(n<0?'-':'')+s+v;
+  return(n<0&&a>=0.5*Math.pow(10,-d)?'-':'')+s+v;
 }
 function fmtDate(d){if(!d)return'—';try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch{return d;}}
 
@@ -4570,28 +4570,47 @@ function prettyDesc(raw){
   if((m=s.match(/(?:IB BILLPAY|BILLPAY).*?(\d{4})\s*$/i)))return 'Credit card bill · ••'+m[1];
   if((m=s.match(/^CC\s+\d*X+(\d{4}).*AUTOPAY/i)))return 'Card autopay · ••'+m[1];
   if((m=s.match(/^FT-\s*(.+?)\s*-/i)))return 'Transfer · '+_title(m[1]);
-  if(/^(ATW|NWD|ATM)/i.test(s))return 'ATM withdrawal';
+  if(/^(ATW|NWD|ATM)(?! Cash Deposit)/i.test(s))return 'ATM withdrawal';
+  // US (Chase-style) narrations
+  if((m=s.match(/^Zelle Payment (From|To) (.+?)(?:\s+(?=\S*\d)\S+)?$/i)))return `Zelle ${m[1].toLowerCase()==='from'?'from':'to'} ${_title(m[2].replace(/\s+US Number.*$/i,''))}`;
+  if((m=s.match(/^(?:\d\d\/\d\d\s+)?(?:Online|ODP) Transfer (To|From) (Sav|Chk|Savings|Checking)\w*\s*\.*(\d{4})/i)))return `${/ODP/i.test(s)?'Overdraft cover':'Transfer'} ${m[1].toLowerCase()} ${/^s/i.test(m[2])?'savings':'checking'} ••${m[3]}`;
+  if((m=s.match(/^Payment To Chase Card Ending IN (\d{4})/i)))return 'Chase card payment · ••'+m[1];
+  if(/^(Non-Chase )?ATM (Withdraw|Withdrawal)/i.test(s))return 'ATM withdrawal';
+  if(/^ATM Cash Deposit/i.test(s))return 'ATM cash deposit';
+  if(/^Chips Credit|Incoming Wire|^Fedwire Credit/i.test(s))return 'International wire in';
+  if((m=s.match(/\bFrom: (.+?)(?: (?:Ref|Info|Iid):|$)/i)))return 'Instant transfer · '+_title(m[1]);
+  if((m=s.match(/^(Recurring )?(?:Card Purchase(?: With Pin| Return)?|Payment Sent|Payment Received)\s+\d\d\/\d\d\s+(.+)$/i))){
+    let n=m[2].replace(/\s+Card\s+\d{4}\s*$/i,'').replace(/\*/g,' ').trim().split(/\s+/);const cut=n.findIndex((w,i)=>i>0&&/[\d#]|\.com$/i.test(w));if(cut>0)n=n.slice(0,cut);
+    if(n.length>1&&/^[A-Z]{2}$/.test(n[n.length-1]))n.pop();
+    return (/Return/i.test(s)?'Refund · ':/^Payment Received/i.test(s)?'Received · ':'')+_title(n.slice(0,4).join(' ').replace(/#.*$/,''));
+  }
+  if((m=s.match(/^(.+?)\s+(?:PPD ID|Web ID|Tel ID|CCD ID):/i)))return _title(m[1].replace(/\s+(?=\S*\d)\S+/g,''));
   return s.length>60?_title(s.slice(0,58))+'…':s;
 }
 const payeeKey=t=>(prettyDesc(t.desc)||t.type||'').toLowerCase();
-const BANK_CATS={Income:'💼',Transfer:'⇄',Family:'👪',Housing:'🏠',Bills:'🧾',Shopping:'🛍',Food:'🍽',Travel:'✈️',Investments:'📈',Loans:'🏦','Credit card':'💳',Cash:'💵',Fees:'⊖',Interest:'✦',Other:'•'};
+const BANK_CATS={Income:'💼',Transfer:'⇄',Family:'👪',Housing:'🏠',Bills:'🧾',Shopping:'🛍',Food:'🍽',Travel:'✈️',Education:'🎓',Casino:'🎰',Investments:'📈',Loans:'🏦','Credit card':'💳',Cash:'💵',Fees:'⊖',Interest:'✦',Other:'•'};
 function txnCat(t){
   if(t.cat&&BANK_CATS[t.cat])return t.cat;
   const u=(t.desc||'').toUpperCase(),sign=txnSign(t);
   if(t.type==='Interest'||/\bINT\b|INTEREST/.test(u))return 'Interest';
-  if(t.type==='Fee'||/CHARGES|\bFEE\b|\bGST\b/.test(u))return 'Fees';
-  if(t.linkId)return 'Transfer';
+  if(t.type==='Fee'||/CHARGES|\bFEE\b|\bGST\b|OVERDRAFT FEE|ATM FEE/.test(u))return 'Fees';
+  if(t.linkId||/^(\d\d\/\d\d )?(ONLINE|ODP) TRANSFER (TO|FROM) (SAV|CHK|SAVINGS|CHECKING)|SOFI BANK|ONE FINANCE|ONE \*|ONE\*FINANCE/.test(u))return 'Transfer';
+  if(/FANDUEL|SPTSBK|DRAFTKINGS|CASINO|BETMGM|MGM GRAND|CAESARS|PRIZEPICKS|HARD ROCK BET|FANATICS BET/.test(u))return 'Casino';
   if(/SALARY|PAYROLL|NET PAY|DIRECT DEP/.test(u))return 'Income';
-  if(/BILLPAY|AUTOPAY|CREDIT CARD|^CC\s|EXC PYMT/.test(u))return 'Credit card';
-  if(/GROWW|ZERODHA|MUTUAL|ICCL|\bSIP\b|INDMONEY|UPSTOX|ROBINHOOD|VANGUARD|FIDELITY|SCHWAB/.test(u))return 'Investments';
-  if(/LOAN|\bEMI\b|BBPS|FIBE|EARLYSALARY|BAJAJ FIN|NAVI/.test(u))return 'Loans';
-  if(/\bRENT\b|LANDLORD|HOUSING/.test(u))return 'Housing';
-  if(/BLINKIT|ZEPTO|SWIGGY|ZOMATO|INSTAMART|BIGBASKET|DMART|RESTAURANT|CAFE|STARBUCKS|DOORDASH/.test(u))return 'Food';
-  if(/AMAZON|FLIPKART|MYNTRA|AJIO|NYKAA|WALMART|TARGET|COSTCO|MEESHO/.test(u))return 'Shopping';
-  if(/UBER|\bOLA\b|RAPIDO|IRCTC|AIRLINE|INDIGO|MAKEMYTRIP|FUEL|\bSHELL\b|VFS/.test(u))return 'Travel';
-  if(/AIRTEL|\bJIO\b|VODAFONE|ELECTRIC|WATER BILL|BROADBAND|RECHARGE|T-MOBILE|VERIZON/.test(u))return 'Bills';
-  if(/^(ATW|NWD|ATM)|CASH WD/.test(u))return 'Cash';
-  if(sign>0&&/REMITLY|RIAFIN|\bWISE\b|XOOM|REMIT|NEFT CR|RTGS CR|^IMPS/.test(u))return 'Transfer';
+  if(/BILLPAY|AUTOPAY|CREDIT CARD|^CC\s|EXC PYMT|CHASE CARD|CHASE CREDIT CRD|AMERICAN ?EXPRESS|DISCOVER (E-PAYMENT|PAYMENTS|PHONE PAY)|CAPITAL ONE|ZOLVE|CARDMEMBER/.test(u))return 'Credit card';
+  if(/GROWW|ZERODHA|MUTUAL|ICCL|\bSIP\b|INDMONEY|UPSTOX|ROBINHOOD|VANGUARD|FIDELITY|SCHWAB|\bBKRG\b|JPMS|WEBULL|COINBASE/.test(u))return 'Investments';
+  if(/LOAN|\bEMI\b|BBPS|FIBE|EARLYSALARY|BAJAJ FIN|NAVI|GLOBAL LENDING/.test(u))return 'Loans';
+  if(/\bRENT\b|LANDLORD|HOUSING|APARTMENT/.test(u))return 'Housing';
+  if(/SCHOOLFEES|TUITION|UNIVERSITY|COLLEGE FEE/.test(u))return 'Education';
+  if(/IRS TREAS|TAX REF|STATEOFMICHIGAN/.test(u))return 'Income';
+  if(/BLINKIT|ZEPTO|SWIGGY|ZOMATO|INSTAMART|BIGBASKET|DMART|RESTAURANT|CAFE|STARBUCKS|DOORDASH|UBER EATS|GRUBHUB|GROCER|KROGER|MEIJER|ALDI|MCDONALD|CHIPOTLE|TACO BELL|PIZZA|DOMINO|BIRYANI|CHICK-FIL|CREAMERY|FOODS|ROTUNDA CAFE|OM MURUGA|BUSCH'S/.test(u))return 'Food';
+  if(/AMAZON|FLIPKART|MYNTRA|AJIO|NYKAA|WALMART|WAL-MART|WM SUPERCENTER|SAMS ?CLUB|TARGET|COSTCO|MEESHO|BEST BUY|EBAY/.test(u))return 'Shopping';
+  if(/UBER|LYFT|\bOLA\b|RAPIDO|IRCTC|AIRLINE|INDIGO|MAKEMYTRIP|FUEL|\bSHELL\b|VFS|DELTA AIR|SPIRIT AIR|AMTRAK|PARKING|FLIGHT|\bARCO\b|TRANSIT|SPEEDWAY|MARATHON|SUNOCO|7-ELEVEN|MARRIOTT|HOTEL|\bINN\b/.test(u))return 'Travel';
+  if(/AIRTEL|\bJIO\b|VODAFONE|ELECTRIC|WATER BILL|BROADBAND|RECHARGE|T-MOBILE|VERIZON|DTE ENERGY|CONSUMERS ENERGY|BOOST MOBILE|MINT MOBILE|XFINITY|COMCAST|SPECTRUM|PLANET FIT/.test(u))return 'Bills';
+  if(/^(ATW|NWD|ATM)|CASH WD|ATM WITHDRAW|ATM CASH DEPOSIT/.test(u))return 'Cash';
+  if(/RIA ?MONEY|REMITLY|RMTLY|ABOUND/.test(u))return 'Family';
+  if(/^ZELLE|APPLE CASH|CASH APP|VENMO|PAYPAL/.test(u))return 'Transfer';
+  if(sign>0&&/REMITLY|RIAFIN|\bWISE\b|XOOM|REMIT|NEFT CR|RTGS CR|^IMPS|CHIPS CREDIT|WIRE/.test(u))return 'Transfer';
   if(sign>0&&/REVERSAL|REFUND|CASHBACK/.test(u))return 'Other';
   return sign>0?'Income':'Other';
 }
@@ -4801,7 +4820,7 @@ function renderLedger(id){
   rows.slice(0,v.limit).forEach(t=>{
     const k=t.date.slice(0,7);
     if(k!==lastM){lastM=k;const g=mt[k],net=g.i-g.o;
-      html+=`<div class="lg-month"><b>${new Date(k+'-01T00:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</b><span class="lg-mt"><span class="c-pos">+${fmt(g.i,cur,0)}</span><span class="c-neg">−${fmt(g.o,cur,0)}</span><span class="${net>=0?'c-pos':'c-neg'}">net ${net>=0?'+':'−'}${fmt(Math.abs(net),cur,0)}</span><span class="lg-close">close ${fmt(monthEnd[k],cur,0)}</span></span></div>`;}
+      html+=`<div class="lg-month"><b>${new Date(k+'-01T00:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</b><span class="lg-mt"><span class="c-pos">+${fmt(g.i,cur,0)}</span><span class="c-neg">−${fmt(g.o,cur,0)}</span><span class="${net>-0.5?'c-pos':'c-neg'}">net ${net>-0.5?'+':'−'}${fmt(Math.abs(net),cur,0)}</span><span class="lg-close">close ${fmt(monthEnd[k],cur,0)}</span></span></div>`;}
     const cat=txnCat(t),pos=t.signed>=0,title=prettyDesc(t.desc)||t.type,dt=new Date(t.date+'T00:00:00');
     html+=`<button type="button" class="lg-row" onclick="openTxnEdit('${a.id}','${t.id}')" title="${esc(t.desc||t.type)}">
       <span class="lg-date"><b>${dt.getDate()}</b>${dt.toLocaleDateString('en-US',{weekday:'short'})}</span>
