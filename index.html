@@ -6234,6 +6234,7 @@ function pfSort(k){_pfSort=_pfSort.k===k?{k,d:-_pfSort.d}:{k,d:k==='t'?1:-1};ren
 function pfTable(){const pos=document.getElementById('pf_q')?.selectionStart;renderPfScreen();const i=document.getElementById('pf_q');if(i){i.focus();try{i.setSelectionRange(pos,pos);}catch(e){}}}
 function _pfDrawCharts(all,tv,tc){
   if(typeof Chart==='undefined')return;
+  Object.values(_pfCharts).forEach(c=>c.destroy());_pfCharts={};
   const fx=_pfFx(_pfCur),money=v=>_pfM(v/fx,0);
   // Cumulative invested (step) vs tracked value and P&L
   const dated=all.filter(r=>r.date).sort((a,b)=>a.date.localeCompare(b.date)),undated=all.filter(r=>!r.date).reduce((s,r)=>s+r.cU,0);
@@ -6366,7 +6367,7 @@ function renderPfHistory(){
   open.forEach(r=>{const b=byB[r.broker];if(b)b.unr=(b.unr||0)+r.pU;});
   const sk=_phSort.k;rows.sort((a,b)=>{const x=a[sk],y=b[sk];if(typeof x==='string'||typeof y==='string')return _phSort.d*String(x||'').localeCompare(String(y||''));return _phSort.d*((x==null?-Infinity:x)-(y==null?-Infinity:y));});
   const th=(k,l)=>`<th class="${_phSort.k===k?'on':''}" onclick="phSort('${k}')">${l}${_phSort.k===k?(_phSort.d<0?' ▾':' ▴'):''}</th>`;
-  const kp=(l,v,s,c='')=>`<div class="pf-kpi"><i>${l}</i><b class="${c}">${v}</b>${s?`<small>${s}</small>`:''}</div>`;
+  const kp=(l,v,s,c='',on='')=>`<div class="pf-kpi"${on?` onclick="${on}" style="cursor:pointer"`:''}><i>${l}</i><b class="${c}">${v}</b>${s?`<small>${s}</small>`:''}</div>`;
   el.innerHTML=`<div class="pf">
     <div class="pf-h"><h3>🕘 Trading history<span>${_plural(all.length,'closed position')} across ${_plural(brokers.length,'account')}</span></h3>
       <div class="pf-mkts"><span class="pf-seg">${['USD','INR'].map(c=>`<button class="${_pfCur===c?'on':''}" onclick="_pfCur='${c}';renderPfScreen();renderPfHistory()">${c}</button>`).join('')}</span></div></div>
@@ -6377,8 +6378,8 @@ function renderPfHistory(){
         <div class="pf-chg"><span class="${_pfCls(rz)}">${inv>0?_pfPct(rz/inv*100):'—'} on ${_pfM(inv,0)} invested</span><span style="color:var(--ink3)">${_pfM(proc,0)} got back</span></div>
         <div class="pf-kpis">
           ${kp('Win rate',rows.length?Math.round(wins.length/rows.length*100)+'%':'—',`${wins.length} wins · ${losses.length} losses`)}
-          ${kp('Best trade',best?esc(best.t):'—',best?_pfS(best.pU):'',best&&best.pU>=0?'pf-up':'')}
-          ${kp('Worst trade',worst?esc(worst.t):'—',worst?_pfS(worst.pU):'',worst&&worst.pU<0?'pf-dn':'')}
+          ${kp('Best trade',best?esc(best.t):'—',best?_pfS(best.pU):'',best&&best.pU>=0?'pf-up':'',best?`openClosed('${best.p.id}','${best.c.id}')`:'')}
+          ${kp('Worst trade',worst?esc(worst.t):'—',worst?_pfS(worst.pU):'',worst&&worst.pU<0?'pf-dn':'',worst?`openClosed('${worst.p.id}','${worst.c.id}')`:'')}
           ${kp('Avg holding',helds.length?Math.round(helds.reduce((a,b)=>a+b,0)/helds.length)+' days':'—','open → close')}
         </div>
       </div>
@@ -6399,7 +6400,7 @@ function renderPfHistory(){
         <div class="filter-group">${['all',...years].map(y=>`<button class="filter-chip ${_phYear===y?'active':''}" onclick="_phYear='${y}';renderPfHistory()">${y==='all'?'All years':y}</button>`).join('')}</div>
       </div>
       <div class="pf-tbl-wrap"><table class="pf-tbl"><thead><tr>${th('t','Position')}${th('sh','Qty')}${th('openDate','Opened')}${th('closeDate','Closed')}${th('held','Held')}${th('cU','Invested')}${th('prU','Got back')}${th('pU','P&amp;L')}${th('ret','Return')}</tr></thead>
-        <tbody>${rows.map(r=>`<tr title="${esc(r.note)}">
+        <tbody>${rows.map(r=>`<tr title="${esc(r.note)}" onclick="openClosed('${r.p.id}','${r.c.id}')">
           <td><div class="pf-symc"><span class="pf-sym" style="background:linear-gradient(135deg,hsl(${_pfHue(r.t)} 55% 45%),hsl(${(_pfHue(r.t)+40)%360} 55% 32%));opacity:.85">${esc(r.t.slice(0,6))}</span><div><b>${esc(r.name)}</b><small>${esc(r.broker)}${r.note?' · '+esc(r.note):''}</small></div></div></td>
           <td>${+r.sh.toFixed(4)}</td><td>${r.openDate?fmtDate(r.openDate):'—'}</td><td>${r.closeDate?fmtDate(r.closeDate):'—'}</td><td>${r.held!=null?r.held+'d':'—'}</td>
           <td>${fmt(r.cost,r.cur)}</td><td>${fmt(r.proc,r.cur)}</td>
@@ -6410,16 +6411,70 @@ function renderPfHistory(){
   </div>`;
   setTimeout(()=>{
     const cv=document.getElementById('ph_cum');if(!cv||typeof Chart==='undefined')return;
+    if(_phChart){_phChart.destroy();_phChart=null;}
     const fx=_pfFx(_pfCur),ev=rows.filter(r=>r.closeDate).sort((a,b)=>a.closeDate.localeCompare(b.closeDate));let run=0;
     const cum=ev.map(r=>{run+=r.pU;return +(run*fx).toFixed(2);});
     _phChart=new Chart(cv,{data:{labels:ev.map(r=>`${r.t} · ${new Date(r.closeDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'})}`),datasets:[
       {type:'line',label:'Cumulative realised',data:cum,borderColor:'#8B5CF6',backgroundColor:'#8B5CF622',fill:true,stepped:true,pointRadius:2,borderWidth:2,order:0},
       {type:'bar',label:'Position P&L',data:ev.map(r=>+(r.pU*fx).toFixed(2)),backgroundColor:ev.map(r=>r.pU>=0?'#10B981CC':'#F43F5ECC'),borderRadius:3,order:1}]},
-      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{boxWidth:8,font:{size:10}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${_pfS(c.raw/fx)}`}}},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        onClick:(e,els)=>{const r=els&&els.length&&ev[els[0].index];if(r)openClosed(r.p.id,r.c.id);},
+        onHover:(e,els)=>{if(e.native&&e.native.target)e.native.target.style.cursor=els&&els.length?'pointer':'default';},
+        plugins:{legend:{labels:{boxWidth:8,font:{size:10}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${_pfS(c.raw/fx)}`,footer:()=>'Click for details'}}},
         scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:10}},y:{ticks:{font:{size:9},callback:v=>_pfM(v/fx,0)}}}}});
   },40);
 }
 function phSort(k){_phSort=_phSort.k===k?{k,d:-_phSort.d}:{k,d:/^(t|openDate)$/.test(k)?1:-1};renderPfHistory();}
+/* Closed-position detail sheet */
+async function openClosed(pid,cid){
+  const all=_phRows(),r=all.find(x=>x.p.id===pid&&x.c.id===cid);if(!r)return;
+  const ev=all.filter(x=>x.closeDate).sort((a,b)=>a.closeDate.localeCompare(b.closeDate));
+  let run=0,cumAfter=0;for(const x of ev){run+=x.pU;if(x===r){cumAfter=run;break;}}
+  const rank=all.slice().sort((a,b)=>a.pU-b.pU).indexOf(r)+1;
+  const buyPx=r.sh>0?r.cost/r.sh:0,sellPx=r.sh>0?r.proc/r.sh:0,yrs=r.held?r.held/365:0;
+  const ann=r.cost>0&&r.proc>0&&yrs>=0.08?(Math.pow(r.proc/r.cost,1/yrs)-1)*100:null;
+  const same=all.filter(x=>x.t===r.t&&x!==r),held=_pfRows().find(x=>x.t===r.t);
+  const kp=(l,v,s,c='')=>`<div class="pf-kpi"><i>${l}</i><b class="${c}">${v}</b>${s?`<small>${s}</small>`:''}</div>`;
+  const pos=r.pnl>=0,share=all.reduce((s,x)=>s+x.pU,0),big=Math.max(r.cost,r.proc,1e-9);
+  const render=(q)=>{
+    const nowPx=/split|bankrupt|cancel/i.test(r.note)?null:q&&q.c>0?q.c:held?held.px:null,ifHeld=nowPx!=null?nowPx*r.sh:null;
+    document.getElementById('hd_title').textContent=`${r.t} · closed position`;
+    document.getElementById('hd_body').innerHTML=`
+      <div class="pf-dh"><span class="pf-sym" style="width:44px;height:44px;background:linear-gradient(135deg,hsl(${_pfHue(r.t)} 55% 45%),hsl(${(_pfHue(r.t)+40)%360} 55% 32%))">${esc(r.t.slice(0,6))}</span>
+        <div><div style="font-weight:700;color:var(--ink)">${esc(r.name)}</div><div style="font-size:11px;color:var(--ink3)">${esc(r.broker)} · ${r.cur}${r.note?' · '+esc(r.note):''}</div></div></div>
+      <div class="pf-dpx ${_pfCls(r.pnl)}">${pos?'+':'−'}${fmt(Math.abs(r.pnl),r.cur)}</div>
+      <div class="pf-chg"><span class="${_pfCls(r.ret)}">${_pfPct(r.ret)} return</span>${r.cur!=='USD'?`<span style="color:var(--ink3)">≈ ${_pfS(r.pU)}</span>`:''}<span style="color:var(--ink3)">${r.held!=null?_plural(r.held,'day')+' held':''}</span></div>
+      <div class="pf-bar" style="margin-top:14px"><i style="width:${Math.min(r.cost,r.proc)/big*100}%;background:#8B5CF6"></i><i style="width:${Math.abs(r.proc-r.cost)/big*100}%;background:${pos?'#10B981':'#F43F5E'}"></i></div>
+      <div class="pf-legend"><span style="--c:#8B5CF6">${pos?'invested':'got back'}</span><span style="--c:${pos?'#10B981':'#F43F5E'}">${pos?'profit':'lost'}</span></div>
+      <div class="pf-mini-h" style="margin-top:16px">Trade</div>
+      <div class="pf-dgrid">
+        ${kp('Quantity',String(+r.sh.toFixed(4)),'shares / units')}
+        ${kp('Avg buy',fmt(buyPx,r.cur),r.openDate?'opened '+fmtDate(r.openDate):'')}
+        ${kp('Avg sell',fmt(sellPx,r.cur),r.closeDate?'closed '+fmtDate(r.closeDate):'')}
+        ${kp('Invested',fmt(r.cost,r.cur),r.cur!=='USD'?'≈ '+fmtUSD(r.cU):'')}
+        ${kp('Got back',fmt(r.proc,r.cur),r.proc===0?'written off':r.cur!=='USD'?'≈ '+fmtUSD(r.prU):'')}
+        ${kp('Annualised',ann!=null?_pfPct(ann):'—',ann!=null?'CAGR over holding period':'too short or total loss',_pfCls(ann))}
+      </div>
+      <div class="pf-mini-h">In context</div>
+      <div class="pf-dgrid">
+        ${kp('Rank',`#${rank} of ${all.length}`,'1 = biggest loss')}
+        ${kp('Share of total',share?Math.round(r.pU/share*100)+'%':'—',`of ${_pfS(share,0)} realised`)}
+        ${kp('Running total',_pfS(cumAfter),'cumulative after this close',_pfCls(cumAfter))}
+        ${ifHeld!=null?kp('If still held',fmt(ifHeld,r.cur),`${fmt(nowPx,r.cur)} now · ${ifHeld-r.proc>=0?'+':'−'}${fmt(Math.abs(ifHeld-r.proc),r.cur)} vs selling`,_pfCls(ifHeld-r.proc)):''}
+        ${same.length?kp('Other trades',String(same.length),`${esc(r.t)} closed ${_plural(same.length,'more time')}`):''}
+        ${held?kp('Holding again',String(+held.sh.toFixed(4)),`in ${esc(held.broker)} · ${_pfPct(held.ret)}`):''}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        <button class="btn btn-outline btn-sm" onclick="pfHistFind('${r.p.id}','${r.c.id}')">Show all ${esc(r.t)} trades</button>
+        ${held?`<button class="btn btn-ghost btn-sm" onclick="closeModal('m_hold');openHolding('${held.p.id}','${held.h.id}')">Open current ${esc(r.t)} position →</button>`:''}
+      </div>
+      ${q===undefined?'<div class="mkt-note" style="margin-top:10px">Fetching today\'s price…</div>':''}`;
+  };
+  const live=r.cur==='USD'&&!held&&!!(state.settings||{}).finnhub&&/^[A-Z.]{1,6}$/.test(r.t);
+  render(live?undefined:null);openModal('m_hold');
+  if(live){const info=await _fhDetail(r.t);if(document.getElementById('m_hold').style.display==='flex')render(info&&info.q&&info.q.c>0?info.q:null);}
+}
+function pfHistFind(pid,cid){const r=_phRows().find(x=>x.p.id===pid&&x.c.id===cid);closeModal('m_hold');if(!r)return;_phQ=r.t;renderPfHistory();document.getElementById('ph_q')?.scrollIntoView({block:'center'});}
 function phTable(){const pos=document.getElementById('ph_q')?.selectionStart;renderPfHistory();const i=document.getElementById('ph_q');if(i){i.focus();try{i.setSelectionRange(pos,pos);}catch(e){}}}
 
 /* ═══ Period filters (year / month) for summary cards ═══ */
