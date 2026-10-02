@@ -1282,6 +1282,46 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
 @media(max-width:900px){.pf-hero,.pf-grid2{grid-template-columns:minmax(0,1fr)}.pf-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.pf-val{font-size:30px}.pf-dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.pf-movers{grid-template-columns:1fr}.pf-tm{height:240px}}
 /* Portfolio navigator */
+/* ── Dashboard command center ── */
+.cc{display:grid;gap:14px;margin:16px 0 4px}
+.cc-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px}
+.cc-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;min-width:0}
+.cc-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.cc-h b{font-size:13px;color:var(--ink)}.cc-h span{font-size:10.5px;color:var(--ink3)}
+.cc-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.cc-k{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;overflow:hidden;cursor:pointer;transition:translate .25s var(--ease),border-color .25s}
+.cc-k:hover{translate:0 -2px;border-color:var(--tone,#6366F1)}
+.cc-k::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:var(--tone,#6366F1)}
+.cc-k i{display:block;font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.cc-k b{display:block;font:600 18px/1.3 var(--mono);color:var(--ink);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-k small{display:block;font-size:10.5px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-nw{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.cc-nw .v{font:600 30px/1 var(--serif);letter-spacing:-.02em}
+.cc-stack{margin-top:12px;display:grid;gap:8px}
+.cc-stack-l{display:flex;justify-content:space-between;font-size:11px;color:var(--ink2);margin-bottom:4px}
+.cc-stack-l b{font-family:var(--mono)}
+.cc-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--surface3)}
+.cc-bar i{display:block;height:100%;min-width:2px}
+.cc-up{display:grid;gap:7px;max-height:330px;overflow:auto;padding-right:2px}
+.cc-ev{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);cursor:pointer}
+.cc-ev:hover{border-color:var(--ink3)}
+.cc-ev .d{text-align:center;border-radius:9px;padding:4px 0;background:var(--surface);border:1px solid var(--border)}
+.cc-ev .d b{display:block;font:700 15px/1.1 var(--mono);color:var(--ink)}.cc-ev .d span{font-size:9.5px;text-transform:uppercase;color:var(--ink3)}
+.cc-ev .t{min-width:0}.cc-ev .t b{display:block;font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cc-ev .t small{font-size:10.5px;color:var(--ink3)}
+.cc-ev .a{text-align:right;font:600 12px var(--mono)}.cc-ev .a small{display:block;font:500 10px var(--sans,inherit);color:var(--ink3)}
+.cc-ev.over{border-color:#F43F5E66;background:color-mix(in srgb,#F43F5E 8%,var(--surface2))}
+.cc-ev.soon{border-color:#F59E0B66}
+.cc-debt{display:grid;gap:6px}
+.cc-dr{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;gap:10px;align-items:center;font-size:11.5px;cursor:pointer;padding:4px 2px;border-radius:8px}
+.cc-dr:hover{background:var(--surface2)}
+.cc-dr .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.cc-dr .n small{display:block;color:var(--ink3);font-size:10px}
+.cc-dr .bar{height:8px;border-radius:5px;background:var(--surface3);overflow:hidden}.cc-dr .bar i{display:block;height:100%;border-radius:5px}
+.cc-dr .v{font:600 11.5px var(--mono);text-align:right;white-space:nowrap}.cc-dr .v small{display:block;font:500 10px var(--sans,inherit);color:var(--ink3)}
+.cc-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;margin-left:5px;vertical-align:1px}
+.cc-badge.bad{background:#F43F5E22;color:#F43F5E}.cc-badge.ok{background:#10B98122;color:#10B981}.cc-badge.info{background:#6366F122;color:#818CF8}
+@media(max-width:1000px){.cc-row{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.cc-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.cc-k b{font-size:15px}.cc-dr{grid-template-columns:minmax(0,1fr) auto}.cc-dr .bar{display:none}}
 .pf-tabs{display:flex;gap:4px;padding:4px;margin:0 0 16px;border-radius:14px;background:var(--surface);border:1px solid var(--border);width:max-content;max-width:100%;overflow-x:auto;position:sticky;top:64px;z-index:6;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .pf-tabs button{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border:0;border-radius:10px;background:none;color:var(--ink2);font:600 12.5px var(--sans,inherit);cursor:pointer;white-space:nowrap;transition:background-color .2s,color .2s}
 .pf-tabs button:hover{color:var(--ink);background:var(--surface2)}
@@ -1471,6 +1511,7 @@ details.lg-grp[open] .lg-chev{transform:rotate(90deg)}
         <div class="hero-stat"><div class="hs-lbl">Cash Flow</div><div class="hs-val" id="d_cf">—</div><div class="hs-delta" id="d_cf_s">income − expenses</div></div>
       </div>
     </div>
+    <div id="dash_cc"></div>
     <div id="dash_filters" class="filter-bar" style="display:none"></div>
     <div class="dash-grid">
       <div class="dash-card full">
@@ -2259,8 +2300,8 @@ let _saveDebounce=null;
 let _cloudBlocked=false;
 const _skFor=uid=>SK+'_'+uid;
 const _clean=d=>typeof sanitizeState==='function'?sanitizeState(d):{loans:[],expenses:[],portfolios:[],incomes:[],accounts:[]};
-function _applyData(d){const c=_clean(d);state.loans=c.loans;state.expenses=c.expenses;state.portfolios=c.portfolios;state.incomes=c.incomes;state.accounts=c.accounts;state.settings=c.settings||{};state.pfHist=c.pfHist||[];}
-const _snapshot=()=>({v:2,loans:state.loans,expenses:state.expenses,portfolios:state.portfolios,incomes:state.incomes,accounts:state.accounts||[],settings:state.settings||{},pfHist:state.pfHist||[]});
+function _applyData(d){const c=_clean(d);state.loans=c.loans;state.expenses=c.expenses;state.portfolios=c.portfolios;state.incomes=c.incomes;state.accounts=c.accounts;state.settings=c.settings||{};state.pfHist=c.pfHist||[];state.nwHist=c.nwHist||[];}
+const _snapshot=()=>({v:2,loans:state.loans,expenses:state.expenses,portfolios:state.portfolios,incomes:state.incomes,accounts:state.accounts||[],settings:state.settings||{},pfHist:state.pfHist||[],nwHist:state.nwHist||[]});
 
 function saveState(){
   if(_currentUser){
@@ -5632,7 +5673,8 @@ function sanitizeState(d){
     accounts:_arr(d.accounts,500).map(a=>{const o={id:_idf(a.id),name:_s(a.name,80)||'Account',bank:_s(a.bank,80),country:_in(a.country,COUNTRIES.map(c=>c.c),'OT'),currency:_curf(a.currency),type:_tok(a.type)||'Other',opening:_n(a.opening),openDate:_dt(a.openDate),notes:_s(a.notes,300),archived:!!a.archived,
       txns:_arr(a.txns,20000).map(t=>{const x={id:_idf(t.id),date:_dt(t.date),type:_in(t.type,Object.keys(TXN_TYPES),'Deposit'),amount:_n(t.amount),desc:_s(t.desc)};_opt(x,'linkId',_RX_ID.test(t.linkId||'')?t.linkId:undefined);_opt(x,'fx',_s(t.fx,60));_opt(x,'cat',typeof BANK_CATS!=='undefined'&&BANK_CATS[t.cat]?t.cat:undefined);return x;})};
       _opt(o,'closedAt',_dt(a.closedAt));return o;}),
-    settings:(()=>{const s=d.settings&&typeof d.settings==='object'?d.settings:{},k=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(v)?v:'';return{finnhub:k(s.finnhub),alphav:k(s.alphav)};})(),
+    settings:(()=>{const s=d.settings&&typeof d.settings==='object'?d.settings:{},k=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(v)?v:'';return{finnhub:k(s.finnhub),alphav:k(s.alphav),credit:(c=>c&&+c.v>=300&&+c.v<=900?{v:Math.round(+c.v),d:_dt(c.d),src:_s(c.src,60)}:undefined)(s.credit)};})(),
+    nwHist:_arr(d.nwHist,1500).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.d||'')).map(x=>({d:x.d,nw:_n(x.nw),a:_n(x.a),l:_n(x.l)})),
     pfHist:_arr(d.pfHist,1500).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.d||'')).map(x=>({d:x.d,v:_n(x.v),c:_n(x.c)})),
   };
 }
@@ -6594,6 +6636,132 @@ function loanInsights(){
 const _renderExpensesIns=renderExpenses;window.renderExpenses=function(){_renderExpensesIns();_secIns('exp',expInsights());};
 const _renderIncomesIns=renderIncomes;window.renderIncomes=function(){_renderIncomesIns();_secIns('inc',incInsights());};
 const _renderLoansIns=window.renderLoans;window.renderLoans=function(){_renderLoansIns();_secIns('loan',loanInsights());};
+
+/* ═══ Dashboard command center — every key number in one place ═══ */
+const _MONIDX={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+// Due amounts/dates are read from loan notes, e.g. "min due $1,123 … by 16-Oct-2026"
+function _loanDues(){
+  const out=[],rx=/(?:min(?:imum)?\s+due|amount\s+due|pay\s+at\s+least|due)\s*(?:of\s*)?([$₹])\s?([\d,]+(?:\.\d+)?)[^·]*?\bby\s+(\d{1,2})-([A-Za-z]{3})-(\d{4})/gi;
+  state.loans.filter(l=>!l.archived).forEach(l=>{
+    let m;rx.lastIndex=0;const seen=new Set();
+    while((m=rx.exec(l.notes||''))){
+      const mi=_MONIDX[m[4].toLowerCase()];if(mi==null)continue;
+      const d=_iso(new Date(+m[5],mi,+m[3])),cur=m[1]==='₹'?'INR':'USD',amt=parseFloat(m[2].replace(/,/g,''));
+      if(seen.has(d))continue;seen.add(d);
+      out.push({d,amt,cur,title:l.name,sub:/past due/i.test(l.notes)?'minimum due · includes past-due amount':'payment due',kind:'due',ref:'lc_'+l.id,sec:'loan',bad:/past due|blocked|bounced/i.test(l.notes||'')});
+    }
+  });
+  return out;
+}
+function _nextPay(){
+  const sal=state.incomes.filter(s=>s.category==='Salary'&&(s.entries||[]).length>=3).sort((a,b)=>b.entries.length-a.entries.length)[0];if(!sal)return null;
+  const ds=sal.entries.map(e=>e.date).filter(Boolean).sort(),gaps=[];for(let i=Math.max(1,ds.length-7);i<ds.length;i++)gaps.push((new Date(ds[i])-new Date(ds[i-1]))/864e5);
+  gaps.sort((a,b)=>a-b);const gap=Math.round(gaps[Math.floor(gaps.length/2)]||14);
+  const t=new Date();t.setHours(0,0,0,0);let n=new Date(ds[ds.length-1]+'T00:00:00');while(n<=t)n.setDate(n.getDate()+gap);
+  const amts=sal.entries.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3).map(e=>+e.amount||0).sort((a,b)=>a-b);
+  return{d:_iso(n),amt:amts[1]??amts[0],cur:sal.currency||'USD',src:sal,gap};
+}
+function _upcoming(){
+  const ev=_loanDues(),np=_nextPay();
+  if(np){ev.push({d:np.d,amt:np.amt,cur:np.cur,title:`${np.src.name} paycheck`,sub:`expected · every ~${np.gap} days`,kind:'in',ref:'ic_'+np.src.id,sec:'inc'});
+    const n2=new Date(np.d+'T00:00:00');n2.setDate(n2.getDate()+np.gap);ev.push({d:_iso(n2),amt:np.amt,cur:np.cur,title:`${np.src.name} paycheck`,sub:'expected',kind:'in',ref:'ic_'+np.src.id,sec:'inc'});}
+  state.loans.filter(l=>!l.archived).forEach(l=>{const m=calcLoanMetrics(l);if(m.method==='gold'&&m.maturity&&m.curBal>0)ev.push({d:m.maturity,amt:m.dueAtMaturity,cur:l.currency||'USD',title:`${l.name} matures`,sub:'bullet repayment (principal + interest)',kind:'due',ref:'lc_'+l.id,sec:'loan',bad:true});});
+  state.portfolios.forEach(p=>(p.holdings||[]).filter(h=>h.sector==='Bonds').forEach(h=>{
+    const t=new Date(),y=t.getFullYear(),c=[new Date(y,0,1),new Date(y,6,1),new Date(y+1,0,1)].find(x=>x>t);
+    ev.push({d:_iso(c),amt:(+h.shares||0)*(+h.buyPrice||0)*0.0805/2,cur:p.currency||'INR',title:`${h.ticker} interest`,sub:'half-yearly bond coupon (est. 8.05%)',kind:'in',ref:'pc_'+p.id,sec:'port'});
+  }));
+  const from=_iso(new Date(Date.now()-21*864e5)),to=_iso(new Date(Date.now()+150*864e5));
+  return ev.filter(e=>e.d>=from&&e.d<=to).sort((a,b)=>a.d.localeCompare(b.d));
+}
+function editCredit(){
+  const c=(state.settings||{}).credit||{};
+  const v=prompt('Latest credit score (300–900)',c.v||'');if(v==null)return;
+  const n=parseInt(v,10);if(!(n>=300&&n<=900)){toast('Enter a score between 300 and 900','err');return;}
+  const src=prompt('Source (e.g. Chase Credit Journey · VantageScore 3.0)',c.src||'')||'';
+  state.settings={...(state.settings||{}),credit:{v:n,d:todayStr(),src:src.slice(0,60)}};
+  saveState();renderCommandCenter();toast('Credit score saved ✓','ok');
+}
+function _nwRecord(nw,a,l){
+  if(!_authed()||!(a||l))return;
+  const d=todayStr(),H=state.nwHist||(state.nwHist=[]),last=H[H.length-1],row={d,nw:+nw.toFixed(2),a:+a.toFixed(2),l:+l.toFixed(2)};
+  if(last&&last.d===d)Object.assign(last,row);else{H.push(row);if(H.length>1500)H.splice(0,H.length-1500);saveState();}
+}
+function renderCommandCenter(){
+  const el=document.getElementById('dash_cc');if(!el||!_authed())return;
+  const now=new Date(),ym=_monthKey(now),lm=_monthKey(new Date(now.getFullYear(),now.getMonth()-1,1)),yr=String(now.getFullYear()),day=now.getDate();
+  const I=_flat(state.incomes,(s,e)=>({d:e.date,u:toUSD(+e.amount||0,s.currency||'USD')})),E=_flat(state.expenses,(t,e)=>({d:e.date,u:toUSD(+e.amount||0,t.currency||'USD')}));
+  const S=(L,f)=>L.filter(f).reduce((s,x)=>s+x.u,0);
+  const incM=S(I,e=>e.d.startsWith(ym)),incLMtd=S(I,e=>e.d.startsWith(lm)&&+e.d.slice(8)<=day),expM=S(E,e=>e.d.startsWith(ym)),expLMtd=S(E,e=>e.d.startsWith(lm)&&+e.d.slice(8)<=day);
+  const incY=S(I,e=>e.d.startsWith(yr)),expY=S(E,e=>e.d.startsWith(yr)),saveY=incY>0?(incY-expY)/incY*100:0;
+  const m3=_lastMonths(4).slice(0,3),exp3=m3.reduce((s,k)=>s+S(E,e=>e.d.startsWith(k)),0)/3,inc12=S(I,e=>e.d>=_iso(new Date(Date.now()-365*864e5)));
+  // Assets
+  const accts=(state.accounts||[]).filter(a=>!a.archived).map(a=>({a,u:toUSD(acctMetrics(a).bal,a.currency||'USD')}));
+  const cash=accts.reduce((s,x)=>s+x.u,0),pr=_pfRows(),inv=pr.reduce((s,r)=>s+r.vU,0),invCost=pr.reduce((s,r)=>s+r.cU,0),invDay=pr.reduce((s,r)=>s+(r.dU||0),0);
+  const realised=_phRows().reduce((s,r)=>s+r.pU,0);
+  // Liabilities
+  const debts=state.loans.filter(l=>!l.archived).map(l=>{const m=calcLoanMetrics(l),cur=l.currency||'USD',bal=m.curBal;return{l,m,cur,bal,u:toUSD(bal,cur),rate:+l.rate||0,bad:/past due|blocked|bounced|over (the|limit)/i.test(l.notes||'')};}).filter(x=>x.u>0.5);
+  const debt=debts.reduce((s,x)=>s+x.u,0),burn=debts.reduce((s,x)=>s+x.u*x.rate/1200,0);
+  const assets=Math.max(0,cash)+inv,nw=cash+inv-debt;
+  _nwRecord(nw,assets,debt);
+  const up=_upcoming(),today=todayStr(),in30=_iso(new Date(Date.now()+30*864e5));
+  const due30=up.filter(e=>e.kind==='due'&&e.d<=in30).reduce((s,e)=>s+toUSD(e.amt,e.cur),0),np=_nextPay();
+  const cr=(state.settings||{}).credit;
+  const pc=(a,b)=>b>0?` (${a>=b?'+':''}${((a-b)/b*100).toFixed(0)}% vs last month)`:'';
+  const K=(tone,label,val,sub,on)=>`<div class="cc-k" style="--tone:${tone}" onclick="${on}" title="${esc(label)}"><i>${label}</i><b>${val}</b><small>${sub}</small></div>`;
+  const sg=v=>(v>=0?'+':'−')+fmtUSD(Math.abs(v),Math.abs(v)<10?2:0);
+  // Composition bars
+  const PAL=['#06B6D4','#3B82F6','#8B5CF6','#10B981','#EC4899','#F59E0B','#14B8A6','#A855F7'];
+  const byType={};debts.forEach(x=>{const t=x.l.type||'Other';byType[t]=(byType[t]||0)+x.u;});
+  const byBroker={};pr.forEach(r=>{byBroker[r.broker]=(byBroker[r.broker]||0)+r.vU;});
+  const aParts=[...accts.filter(x=>x.u>0).map(x=>[x.a.name,x.u]),...Object.entries(byBroker).map(([k,v])=>['📈 '+k,v])].sort((a,b)=>b[1]-a[1]);
+  const lParts=Object.entries(byType).sort((a,b)=>b[1]-a[1]);
+  const LCOL={Gold:'#F59E0B','Credit Card':'#F43F5E',Personal:'#A855F7',Student:'#3B82F6',Auto:'#14B8A6',Mortgage:'#06B6D4'};
+  const bar=(parts,tot,colFn)=>`<div class="cc-bar">${parts.map(([k,v],i)=>`<i style="width:${tot>0?v/tot*100:0}%;background:${colFn(k,i)}" title="${esc(k)} · ${fmtUSD(v,0)} (${tot>0?(v/tot*100).toFixed(1):0}%)"></i>`).join('')}</div><div class="pf-legend">${parts.slice(0,6).map(([k,v],i)=>`<span style="--c:${colFn(k,i)}">${esc(k)} <b>${fmtUSD(v,0)}</b></span>`).join('')}${parts.length>6?`<span style="--c:#64748B">+${parts.length-6} more</span>`:''}</div>`;
+  const H=(state.nwHist||[]).slice(-180),spark=H.length>=2?_spark(H.map((h,i)=>[i,h.nw]),220,40):'';
+  // Debt stack (avalanche order)
+  const ds=debts.slice().sort((a,b)=>b.rate-a.rate||b.u-a.u),mx=Math.max(...ds.map(x=>x.u),1);
+  const debtRows=ds.map(x=>`<div class="cc-dr" onclick="jumpTo('loan','lc_${x.l.id}')"><div class="n">${esc(x.l.name)}${x.bad?'<span class="cc-badge bad">ATTN</span>':''}${!x.rate?'<span class="cc-badge ok">0%</span>':''}<small>${esc(x.l.type||'')} · ${x.rate?x.rate.toFixed(2)+'%':'interest-free'}${x.m.method==='gold'?' · bullet':''}</small></div><div class="bar"><i style="width:${x.u/mx*100}%;background:${LCOL[x.l.type]||'#64748B'}"></i></div><div class="v">${fmtUSD(x.u,0)}${x.cur!=='USD'?`<small>${fmt(x.bal,x.cur,0)}</small>`:`<small>${fmtUSD(x.u*x.rate/1200,0)}/mo int.</small>`}</div></div>`).join('');
+  const evRows=up.map(e=>{const dt=new Date(e.d+'T00:00:00'),dl=Math.round((dt-new Date(today+'T00:00:00'))/864e5),cls=e.kind==='due'&&dl<0?'over':e.kind==='due'&&dl<=7?'soon':'';
+    return `<div class="cc-ev ${cls}" onclick="jumpTo('${e.sec}','${e.ref}')"><div class="d"><b>${dt.getDate()}</b><span>${dt.toLocaleDateString('en-US',{month:'short'})}</span></div><div class="t"><b>${e.kind==='in'?'⬇ ':'⬆ '}${esc(e.title)}</b><small>${esc(e.sub)}</small></div><div class="a ${e.kind==='in'?'pf-up':'pf-dn'}">${e.kind==='in'?'+':'−'}${fmt(e.amt,e.cur,0)}<small>${dl===0?'today':dl<0?`${-dl}d overdue`:`in ${dl}d`}</small></div></div>`;}).join('');
+  el.innerHTML=`<div class="cc">
+    <div class="cc-row">
+      <div class="cc-card">
+        <div class="cc-h"><b>🧭 Net worth</b><span>cash + investments − debt · USD equivalent${H.length<2?' · daily tracking started':''}</span></div>
+        <div class="cc-nw"><span class="v ${nw>=0?'pf-up':'pf-dn'}">${sg(nw)}</span>${spark}<span style="font-size:11px;color:var(--ink3)">${H.length>=2?`${sg(nw-H[0].nw)} since ${fmtDate(H[0].d)}`:''}</span></div>
+        <div class="cc-stack">
+          <div><div class="cc-stack-l"><span>What you own</span><b class="pf-up">${fmtUSD(assets,0)}</b></div>${bar(aParts,assets,(k,i)=>PAL[i%PAL.length])}</div>
+          <div><div class="cc-stack-l"><span>What you owe</span><b class="pf-dn">${fmtUSD(debt,0)}</b></div>${bar(lParts,debt,k=>LCOL[k]||'#64748B')}</div>
+        </div>
+      </div>
+      <div class="cc-card">
+        <div class="cc-h"><b>📅 Upcoming</b><span>dues, maturities &amp; expected income · next 150 days</span></div>
+        <div class="cc-up">${evRows||'<div class="es-sub">Nothing scheduled.</div>'}</div>
+      </div>
+    </div>
+    <div class="cc-kpis">
+      ${K('#10B981','Income · this month',fmtUSD(incM,0),`${fmtUSD(incLMtd,0)} by day ${day} last month`,"goTo('inc')")}
+      ${K('#F43F5E','Spent · this month',fmtUSD(expM,0),`${fmtUSD(expLMtd,0)} by day ${day} last month`,"goTo('exp')")}
+      ${K('#10B981','Income · '+yr,fmtUSD(incY,0),`${fmtUSD(inc12,0)} last 12 months`,"_per.inc.p='ytd';goTo('inc')")}
+      ${K('#F43F5E','Spent · '+yr,fmtUSD(expY,0),`${fmtUSD(exp3,0)}/mo avg (3 months)`,"_per.exp.p='ytd';goTo('exp')")}
+      ${K(saveY>=0?'#10B981':'#F43F5E','Savings rate · '+yr,saveY.toFixed(1)+'%',`${sg(incY-expY)} kept`,"goTo('analytics')")}
+      ${K('#06B6D4','Cash in banks',fmtUSD(cash,0),`${_plural(accts.length,'account')}`,"goTo('acct')")}
+      ${K('#8B5CF6','Investments',fmtUSD(inv,0),`${sg(invDay)} today · ${sg(inv-invCost)} open P&L`,"goTo('port')")}
+      ${K(realised>=0?'#10B981':'#F43F5E','Realised P&L',sg(realised),'closed positions, lifetime',"setPfView('history');goTo('port')")}
+      ${K('#F43F5E','Total debt',fmtUSD(debt,0),`${_plural(debts.length,'open loan')} · ${debts.filter(x=>x.bad).length} need attention`,"goTo('loan')")}
+      ${K('#F59E0B','Interest burn',fmtUSD(burn,0)+'/mo',`${fmtUSD(burn*12,0)} a year at current rates`,"goTo('loan')")}
+      ${K(due30>0?'#F43F5E':'#10B981','Due · next 30 days',fmtUSD(due30,0),`${up.filter(e=>e.kind==='due'&&e.d<=in30).length} payments from loan notes`,"goTo('loan')")}
+      ${K('#10B981','Next paycheck',np?fmt(np.amt,np.cur,0):'—',np?`${fmtDate(np.d)} · ${esc(np.src.name)}`:'add a Salary source',"goTo('inc')")}
+      ${K('#3B82F6','Debt-to-income',inc12>0?(debt/inc12*100).toFixed(0)+'%':'—','debt ÷ last-12-month income',"goTo('analytics')")}
+      ${K(cr?cr.v>=670?'#10B981':cr.v>=580?'#F59E0B':'#F43F5E':'#64748B','Credit score',cr?String(cr.v):'Add',cr?`${cr.d?fmtDate(cr.d):''}${cr.src?' · '+esc(cr.src):''}`:'click to record your score',"editCredit()")}
+    </div>
+    <div class="cc-card">
+      <div class="cc-h"><b>🏦 Debt stack</b><span>highest rate first (avalanche order) · ${fmtUSD(burn,0)}/mo interest · click to open</span></div>
+      <div class="cc-debt">${debtRows||'<div class="es-sub">No open debt 🎉</div>'}</div>
+    </div>
+  </div>`;
+}
+const _refreshDashCC=window.refreshDash;
+window.refreshDash=function(){_refreshDashCC();renderCommandCenter();};
 
 /* ── Static selects for the new modals ── */
 (()=>{
