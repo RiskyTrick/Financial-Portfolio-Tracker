@@ -5658,7 +5658,7 @@ const _opt=(o,k,v)=>{if(v!==undefined&&v!==null&&v!=='')o[k]=v;return o;};
 function sanitizeState(d){
   d=d&&typeof d==='object'?d:{};
   return{
-    loans:_arr(d.loans).map(l=>{const o={id:_idf(l.id),name:_s(l.name,80)||'Loan',type:_tok(l.type)||'Other',currency:_curf(l.currency),startDate:_dt(l.startDate),principal:_n(l.principal),rate:_n(l.rate),termMonths:Math.min(600,Math.max(1,parseInt(l.termMonths)||1)),notes:_s(l.notes,300),color:/^#[0-9a-f]{3,8}$/i.test(l.color||'')?l.color:CARD_COLORS[0],archived:!!l.archived,
+    loans:_arr(d.loans).map(l=>{const o={id:_idf(l.id),name:_s(l.name,80)||'Loan',type:_tok(l.type)||'Other',currency:_curf(l.currency),startDate:_dt(l.startDate),principal:_n(l.principal),rate:_n(l.rate),termMonths:Math.min(600,Math.max(1,parseInt(l.termMonths)||1)),notes:_s(l.notes,600),color:/^#[0-9a-f]{3,8}$/i.test(l.color||'')?l.color:CARD_COLORS[0],archived:!!l.archived,
       payments:_arr(l.payments).map(p=>{const x={id:_idf(p.id),date:_dt(p.date),amount:_n(p.amount),note:_s(p.note),payType:_tok(p.payType)||PAY_TYPES[0]};if(p.int!=null&&isFinite(parseFloat(p.int)))x.int=_n(p.int);if(p.fee!=null&&isFinite(parseFloat(p.fee)))x.fee=_n(p.fee);return x;})};
       _opt(o,'closedAt',_dt(l.closedAt));_opt(o,'method',_in(l.method,['emi','gold'],undefined));return o;}),
     expenses:_arr(d.expenses).map(t=>({id:_idf(t.id),name:_s(t.name,80)||'Expenses',currency:_curf(t.currency),month:/^\d{4}-\d{2}$/.test(t.month||'')?t.month:'',budget:_n(t.budget),
