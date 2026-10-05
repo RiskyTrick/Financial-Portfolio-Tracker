@@ -2,10 +2,14 @@
 data-backup/
 Accounts/
 Gold loan imgs/
+Chase Statements/
 *.pdf
 *.jpg
 *.jpeg
+*.png
 *.csv
+*.xlsx
+*.xls
 portfolio_backup_*.txt
 history_*.csv
 .env
