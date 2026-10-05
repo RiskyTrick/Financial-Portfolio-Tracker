@@ -1168,7 +1168,9 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px
 .lg-amt{display:flex;flex-direction:column;align-items:flex-end;font:600 13.5px var(--mono);white-space:nowrap}
 .lg-amt small{font-size:10px;font-weight:500;color:var(--ink4)}
 .lg-amt.pos{color:var(--tx-g)}.lg-amt.neg{color:var(--ink)}
-.ai-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.ai-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.ai-per{margin:2px 0 14px}.ai-per .per-chips button.on{background:var(--surface2)}
+.ai-per-l{font:600 10.5px var(--mono);color:var(--ink3);margin-left:4px}
 .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 22px}
 .ai-bar{margin-bottom:10px}
 .ai-bar-h{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--ink2)}
@@ -5077,32 +5079,70 @@ function _lgRow(a,t,cur){
       <span class="lg-amt ${pos?'pos':'neg'}">${pos?'+':'−'}${fmt(Math.abs(t.signed),cur)}<small>bal ${fmt(t.balAfter,cur)}</small></span>
     </button>`;
 }
+const _AI_PRESETS=[['tw','This week'],['lw','Last week'],['30','30 days'],['mtd','This month'],['lm','Last month'],['90','90 days'],['ytd','This year'],['ly','Last year'],['365','12 months'],['all','All time']];
+function _aiRange(v,first){
+  const n=new Date(),Y=n.getFullYear(),M=n.getMonth(),D=n.getDate(),iso=_iso,today=iso(n),ago=d=>iso(new Date(Y,M,D-d));
+  if(v.ip==='custom'&&v.iy){
+    if(v.im){const m=+v.im-1;return{from:iso(new Date(+v.iy,m,1)),to:iso(new Date(+v.iy,m+1,0)),label:new Date(+v.iy,m,1).toLocaleDateString('en-US',{month:'short',year:'numeric'})};}
+    return{from:`${v.iy}-01-01`,to:`${v.iy}-12-31`,label:v.iy};
+  }
+  const mon=new Date(Y,M,D-((n.getDay()+6)%7));
+  return({tw:{from:iso(mon),to:today,label:'this week'},lw:{from:iso(new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()-7)),to:iso(new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()-1)),label:'last week'},
+    '30':{from:ago(30),to:today,label:'last 30 days'},mtd:{from:iso(new Date(Y,M,1)),to:today,label:'this month'},lm:{from:iso(new Date(Y,M-1,1)),to:iso(new Date(Y,M,0)),label:'last month'},
+    '90':{from:ago(90),to:today,label:'last 90 days'},ytd:{from:`${Y}-01-01`,to:today,label:`${Y} so far`},ly:{from:`${Y-1}-01-01`,to:`${Y-1}-12-31`,label:String(Y-1)},
+    '365':{from:_lastMonths(12)[0]+'-01',to:today,label:'last 12 months'},all:{from:first||'',to:today,label:'all time'}})[v.ip]||{from:_lastMonths(12)[0]+'-01',to:today,label:'last 12 months'};
+}
+function setAcctIns(id,k,val){
+  const v=_av(id);
+  if(k==='p'){v.ip=val;v.iy='';v.im='';}
+  else if(k==='y'){v.iy=val;v.im='';v.ip=val?'custom':'365';}
+  else if(k==='m'){v.im=val;if(!v.iy)v.iy=String(new Date().getFullYear());v.ip='custom';}
+  buildAcctInsights(id);
+}
 function buildAcctInsights(id){
   const a=_acct(id),el=document.getElementById('ains_'+id);if(!a||!el)return;
-  const cur=a.currency||'USD',m=acctMetrics(a),from=_lastMonths(12)[0]+'-01',r12=m.rows.filter(r=>r.date>=from);
+  const cur=a.currency||'USD',m=acctMetrics(a),v=_av(id);
   if(!m.count){el.innerHTML=`<div class="empty-state" style="padding:22px"><div class="es-icon">💡</div><div class="es-sub">Insights appear once this account has activity.</div></div>`;return;}
+  if(!v.ip)v.ip='365';
+  const first=m.rows[0].date,R=_aiRange(v,first),inR=d=>d>=(R.from||'')&&d<=R.to;
+  const rr=m.rows.filter(r=>inR(r.date)),rr2=rr.filter(r=>!r.linkId);
+  const days=Math.max(1,Math.round((new Date(R.to+'T00:00:00')-new Date((R.from||first)+'T00:00:00'))/864e5)+1),months=days/30.44;
+  const years=[...new Set(m.rows.map(r=>r.date.slice(0,4)))].sort().reverse();
+  const bar=`<div class="per-bar ai-per">
+      <div class="per-chips">${_AI_PRESETS.map(([k,l])=>`<button class="${v.ip===k?'on':''}" onclick="setAcctIns('${id}','p','${k}')">${l}</button>`).join('')}</div>
+      <select class="per-sel" onchange="setAcctIns('${id}','y',this.value)" aria-label="Year"><option value="">Year…</option>${years.map(y=>`<option${v.ip==='custom'&&v.iy===y?' selected':''}>${y}</option>`).join('')}</select>
+      <select class="per-sel" onchange="setAcctIns('${id}','m',this.value)" aria-label="Month"><option value="">${v.ip==='custom'&&v.iy?'Whole year':'Month…'}</option>${_MON.map((mn,i)=>{const k=String(i+1).padStart(2,'0');return `<option value="${k}"${v.ip==='custom'&&v.im===k?' selected':''}>${mn}</option>`;}).join('')}</select>
+      <span class="ai-per-l">${esc(R.label)} · ${_plural(rr2.length,'txn')}${rr.length>rr2.length?` · ${rr.length-rr2.length} own transfers excluded`:''}</span>
+    </div>`;
+  if(!rr2.length){el.innerHTML=bar+`<div class="empty-state" style="padding:22px"><div class="es-icon">🔍</div><div class="es-sub">No activity ${esc(R.label)}.</div></div>`;return;}
   const agg=(list)=>{const o={};list.forEach(r=>{const k=prettyDesc(r.desc)||r.type,g=o[k]||(o[k]={k,s:0,n:0,last:''});g.s+=Math.abs(r.signed);g.n++;if(r.date>g.last)g.last=r.date;});return Object.values(o).sort((x,y)=>y.s-x.s);};
-  const outs=agg(r12.filter(r=>r.signed<0)),ins=agg(r12.filter(r=>r.signed>0));
-  const cats={};r12.filter(r=>r.signed<0).forEach(r=>{const c=txnCat(r);cats[c]=(cats[c]||0)-r.signed;});const catList=Object.entries(cats).sort((x,y)=>y[1]-x[1]);
-  const byPayeeMonths={};m.rows.filter(r=>r.signed<0).forEach(r=>{const k=prettyDesc(r.desc)||r.type,g=byPayeeMonths[k]||(byPayeeMonths[k]={k,months:new Set(),amts:[],last:''});g.months.add(r.date.slice(0,7));g.amts.push(-r.signed);if(r.date>g.last)g.last=r.date;});
+  const outs=agg(rr2.filter(r=>r.signed<0)),ins=agg(rr2.filter(r=>r.signed>0));
+  const cats={};rr2.filter(r=>r.signed<0).forEach(r=>{const c=txnCat(r);cats[c]=(cats[c]||0)-r.signed;});const catList=Object.entries(cats).sort((x,y)=>y[1]-x[1]);
+  // Recurring needs a few months of history; fall back to all-time for short ranges
+  const recBase=months>=3?rr2:m.rows.filter(r=>!r.linkId),recAll=months<3;
+  const byPayeeMonths={};recBase.filter(r=>r.signed<0).forEach(r=>{const k=prettyDesc(r.desc)||r.type,g=byPayeeMonths[k]||(byPayeeMonths[k]={k,months:new Set(),amts:[],last:''});g.months.add(r.date.slice(0,7));g.amts.push(-r.signed);if(r.date>g.last)g.last=r.date;});
   const recurring=Object.values(byPayeeMonths).filter(g=>g.months.size>=3).map(g=>({...g,avg:g.amts.reduce((s,x)=>s+x,0)/g.amts.length,n:g.amts.length})).sort((x,y)=>y.months.size-x.months.size||y.avg-x.avg).slice(0,6);
-  const big=[...r12].sort((x,y)=>Math.abs(y.signed)-Math.abs(x.signed)).slice(0,5);
-  const ends=_lastMonths(12).map(k=>{const r=m.rows.filter(x=>x.date.slice(0,7)<=k).pop();return r?r.balAfter:(parseFloat(a.opening)||0);});
-  const low=m.rows.reduce((lo,r)=>r.balAfter<lo.b?{b:r.balAfter,d:r.date}:lo,{b:Infinity,d:''});
-  const inSum=r12.reduce((s,r)=>s+Math.max(0,r.signed),0),outSum=r12.reduce((s,r)=>s+Math.max(0,-r.signed),0);
-  const bars=(list,total,cls,lim=6)=>list.slice(0,lim).map(g=>`<div class="ai-bar"><div class="ai-bar-h"><span>${esc(g.k)}</span><b>${fmt(g.s,cur,0)}</b></div><div class="ai-track"><i class="${cls}" style="width:${total>0?Math.max(2,g.s/total*100):0}%"></i></div><div class="ai-sub">${_plural(g.n,'payment')} · last ${fmtDate(g.last)}</div></div>`).join('')||'<div class="es-sub">Nothing in the last 12 months.</div>';
-  el.innerHTML=`<div class="ai-kpis">
-      <div class="pl-kpi"><span>Avg in / month</span><b class="c-pos">${fmt(inSum/12,cur,0)}</b><small>last 12 months</small></div>
-      <div class="pl-kpi"><span>Avg out / month</span><b class="c-neg">${fmt(outSum/12,cur,0)}</b><small>last 12 months</small></div>
-      <div class="pl-kpi"><span>Avg month-end balance</span><b>${fmt(ends.reduce((s,x)=>s+x,0)/ends.length,cur,0)}</b><small>12 months</small></div>
-      <div class="pl-kpi"><span>Lowest balance</span><b class="${low.b<0?'c-neg':''}">${fmt(low.b,cur,0)}</b><small>${low.d?fmtDate(low.d):''}</small></div>
+  const big=[...rr2].sort((x,y)=>Math.abs(y.signed)-Math.abs(x.signed)).slice(0,5);
+  const mk=[];for(let d=new Date((R.from||first).slice(0,7)+'-01T00:00:00');_iso(d).slice(0,7)<=R.to.slice(0,7);d.setMonth(d.getMonth()+1))mk.push(_iso(d).slice(0,7));
+  const ends=mk.map(k=>{const r=m.rows.filter(x=>x.date.slice(0,7)<=k).pop();return r?r.balAfter:(parseFloat(a.opening)||0);});
+  const lowR=rr.reduce((lo,r)=>r.balAfter<lo.b?{b:r.balAfter,d:r.date}:lo,{b:Infinity,d:''}),hiR=rr.reduce((hi,r)=>r.balAfter>hi.b?{b:r.balAfter,d:r.date}:hi,{b:-Infinity,d:''});
+  const inSum=rr2.reduce((s,r)=>s+Math.max(0,r.signed),0),outSum=rr2.reduce((s,r)=>s+Math.max(0,-r.signed),0),net=inSum-outSum;
+  const perM=months>=1.5;
+  const bars=(list,total,cls,lim=6)=>list.slice(0,lim).map(g=>`<div class="ai-bar"><div class="ai-bar-h"><span>${esc(g.k)}</span><b>${fmt(g.s,cur,0)}</b></div><div class="ai-track"><i class="${cls}" style="width:${total>0?Math.max(2,g.s/total*100):0}%"></i></div><div class="ai-sub">${_plural(g.n,'payment')} · last ${fmtDate(g.last)}</div></div>`).join('')||`<div class="es-sub">Nothing ${esc(R.label)}.</div>`;
+  el.innerHTML=bar+`<div class="ai-kpis">
+      <div class="pl-kpi"><span>Money in</span><b class="c-pos">${fmt(inSum,cur,0)}</b><small>${perM?fmt(inSum/months,cur,0)+' / month':esc(R.label)}</small></div>
+      <div class="pl-kpi"><span>Money out</span><b class="c-neg">${fmt(outSum,cur,0)}</b><small>${perM?fmt(outSum/months,cur,0)+' / month':fmt(outSum/days,cur,0)+' / day'}</small></div>
+      <div class="pl-kpi"><span>Net</span><b class="${net>=0?'c-pos':'c-neg'}">${net>=0?'+':'−'}${fmt(Math.abs(net),cur,0)}</b><small>in − out</small></div>
+      <div class="pl-kpi"><span>${mk.length>1?'Avg month-end balance':'Month-end balance'}</span><b>${fmt(ends.reduce((s,x)=>s+x,0)/Math.max(1,ends.length),cur,0)}</b><small>${_plural(mk.length,'month')}</small></div>
+      <div class="pl-kpi"><span>Lowest balance</span><b class="${lowR.b<0?'c-neg':''}">${isFinite(lowR.b)?fmt(lowR.b,cur,0):'—'}</b><small>${lowR.d?fmtDate(lowR.d):''}</small></div>
+      <div class="pl-kpi"><span>Highest balance</span><b>${isFinite(hiR.b)?fmt(hiR.b,cur,0):'—'}</b><small>${hiR.d?fmtDate(hiR.d):''}</small></div>
     </div>
     <div class="ai-grid">
       <div><div class="mini-h">⬆ Where money went · top payees</div>${bars(outs,outSum,'out')}</div>
-      <div><div class="mini-h">⬇ Where money came from</div>${bars(ins,inSum,'in',5)}</div>
+      <div><div class="mini-h">⬇ Where money came from</div>${bars(ins,inSum,'in',6)}</div>
       <div><div class="mini-h">🏷 Spending by category</div>${catList.map(([c,s])=>`<div class="ai-bar"><div class="ai-bar-h"><span>${BANK_CATS[c]} ${c}</span><b>${fmt(s,cur,0)}</b></div><div class="ai-track"><i class="out" style="width:${outSum>0?Math.max(2,s/outSum*100):0}%"></i></div><div class="ai-sub">${outSum>0?(s/outSum*100).toFixed(0):0}% of outflows</div></div>`).join('')||'<div class="es-sub">No outflows.</div>'}</div>
-      <div><div class="mini-h">🔁 Recurring payments</div>${recurring.length?recurring.map(g=>`<div class="an-metric-row"><span class="an-metric-label">${esc(g.k)} <small style="color:var(--ink3)">· ${g.months.size} months</small></span><span class="an-metric-val">${fmt(g.avg,cur,0)} <small style="color:var(--ink3)">avg</small></span></div>`).join(''):'<div class="es-sub">No payee seen in 3+ months yet.</div>'}
-        <div class="mini-h" style="margin-top:16px">⭐ Largest transactions · 12 months</div>${big.map(r=>`<div class="an-metric-row"><span class="an-metric-label">${esc(prettyDesc(r.desc)||r.type)} <small style="color:var(--ink3)">· ${fmtDate(r.date)}</small></span><span class="an-metric-val ${r.signed>=0?'g':'r'}">${r.signed>=0?'+':'−'}${fmt(Math.abs(r.signed),cur,0)}</span></div>`).join('')}</div>
+      <div><div class="mini-h">🔁 Recurring payments${recAll?' · all time':''}</div>${recurring.length?recurring.map(g=>`<div class="an-metric-row"><span class="an-metric-label">${esc(g.k)} <small style="color:var(--ink3)">· ${g.months.size} months</small></span><span class="an-metric-val">${fmt(g.avg,cur,0)} <small style="color:var(--ink3)">avg</small></span></div>`).join(''):'<div class="es-sub">No payee seen in 3+ months.</div>'}
+        <div class="mini-h" style="margin-top:16px">⭐ Largest transactions · ${esc(R.label)}</div>${big.map(r=>`<div class="an-metric-row" style="cursor:pointer" onclick="openTxnEdit('${a.id}','${r.id}')"><span class="an-metric-label">${esc(prettyDesc(r.desc)||r.type)} <small style="color:var(--ink3)">· ${fmtDate(r.date)}</small></span><span class="an-metric-val ${r.signed>=0?'g':'r'}">${r.signed>=0?'+':'−'}${fmt(Math.abs(r.signed),cur,0)}</span></div>`).join('')}</div>
     </div>`;
 }
 function exportAcctCSV(id){
